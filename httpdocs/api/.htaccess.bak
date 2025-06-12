@@ -1,0 +1,40 @@
+# /httpdocs/api/.htaccess
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Autoriser tous les sous-domaines de jemefaiscomprendre.com
+SetEnvIf Origin "^https?://([^.]+\.)?dynseo\.com$" ALLOWED_ORIGIN=$0
+Header set Access-Control-Allow-Origin %{ALLOWED_ORIGIN}e env=ALLOWED_ORIGIN
+Header set Access-Control-Allow-Methods "GET, OPTIONS"
+Header set Access-Control-Allow-Headers "Authorization, Content-Type"
+Header set Access-Control-Allow-Credentials "true"
+
+# Si la requête n'est pas autorisée, renvoyer une erreur 403
+RewriteEngine On
+RewriteCond %{ENV:ALLOWED_ORIGIN} !^https?://([^.]+\.)?dynseo\.com$
+RewriteRule .* - [F]
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Gestion CORS dynamique
+SetEnvIf Origin "^https?://(.*\.)?jmfc\.dynseo\.com(:\d+)?$" CORS_ALLOW_ORIGIN=$0
+Header set Access-Control-Allow-Origin "%{CORS_ALLOW_ORIGIN}e" env=CORS_ALLOW_ORIGIN
+Header set Access-Control-Allow-Methods "GET, OPTIONS"
+Header set Access-Control-Allow-Headers "Authorization, Content-Type"
+Header set Access-Control-Allow-Credentials "true"
+Header always set Vary "Origin"
+
+# Gestion des requêtes OPTIONS (prévol)
+RewriteEngine On
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^ - [L]
+
+# Blocage des origines non autorisées
+RewriteCond %{ENV:CORS_ALLOW_ORIGIN} ^$
+RewriteRule ^ - [F]

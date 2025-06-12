@@ -1,0 +1,134 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>JeMeFaisComprendre Privacy Policy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="css/skeleton.css">
+
+    <style>
+        body {
+            margin-left: 1.5em;
+        }
+
+        div {
+            max-width: 1000px;
+        }
+
+        ul {
+            list-style-type: revert;
+            padding-left: revert;
+            margin-top: revert;
+        }
+    </style>
+</head>
+<body>
+<h1>JeMeFaisComprendre Privacy Policy</h1>
+<div style="margin-bottom: 1em"><a id="backLink1" href="../#about"> Back to the app </a></div>
+<div>
+    We inform you about the most important aspects of data processing in the JeMeFaisComprendre App.<br/>
+    Eryn Playground is responsible for data processing: <br/>
+    COMMERCIAL BUILDING 15 SOY STREET<br>
+    MONGKOK, KOWLOON<br>
+    HONG KONG<br/>
+    <a href="mailto:contact@jemefaiscomprendre.com">contact@jemefaiscomprendre.com</a>
+</div>
+<h2>Data Processing</h2>
+<div>
+    The JeMeFaisComprendre App is an augmentative and alternative communication (AAC) application. The application can be
+    individually adapted to the needs of users. It is possible to add custom images, texts, or audios to the user grids. All these types of data are subsequently called "personal data" or "personalized data".
+    <h3>Offline</h3>
+    <div>
+        All personalized data is stored locally on the user's device. Data is stored in an internal database of the browser (IndexedDB) which is
+        accessible only to the current user of the device.
+    </div>
+    <h3>Online</h3>
+    <div>
+        <p>All personalized data is also stored in a database of Eryn Playground and can therefore be accessed and
+            synchronized on multiple devices of the user. However, all personal data is encrypted end-to-end. This
+            means that only the user himself can see it unencrypted, when logging in with their username and password. Eryn Playground has no possibility to access or process personal data, which are saved in an encrypted manner.
+            The key for encrypting the data is the user-chosen password. For encryption, the
+            <a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">AES algorithm</a>
+            and the <a href="https://github.com/bitwiseshiftleft/sjcl">sjcl software library</a> are used.
+        </p>
+        <p>The following data can be found in Eryn Playground's database without having the decryption keys:</p>
+        <ul>
+            <li>
+                <strong>Username and email</strong>: the freely chosen username and email are stored unencrypted. Username is only
+                used to identify the user account.
+                <br>
+                The username and email address are the only data records that can possibly be linked to a
+                person.
+            </li>
+            <li>
+                <strong>Number of grids</strong>: although all content is encrypted, it is possible to see the number
+                of grids a user has created.
+            </li>
+        </ul>
+    </div>
+    <h3>Access Analysis</h3>
+    <div>
+        For the JeMeFaisComprendre App, we use an access analysis tool from <a href="https://github.com/matomo-org/matomo">Matomo</a>.
+        All data collected in this way is stored on our own servers, will not be passed to third parties, and cannot be
+        linked to individual persons. The following data is saved:
+        <ul>
+            <li>Anonymized IP addresses of the users (the last 2 bytes are deleted, e.g., 89.128.xxx.xxx)</li>
+            <li>Count and duration of access</li>
+            <li>Operating system, browser version, and screen resolution used for access</li>
+        </ul>
+    </div>
+</div>
+<h2>Legal Basis</h2>
+<div>
+    The legal basis for the usage of the username and email is consent, as the user has to consent to the data processing when registering.
+</div>
+<h2 id="data-transfer">Data Transfer</h2>
+<div>
+    If you use synthesized voices with the suffix "online" (see "Settings" -> "User settings" -> "Voice") or if you
+    use the default voice and only voices with the "online" suffix are available, all pronounced texts are sent
+    to the respective online services in order to generate the speech output.<br>
+    When using voices with the "offline" suffix, no data is sent to external services.
+    <br/>
+    <br/>
+    Apart from this, no data is transferred to third parties.
+</div>
+<h2>Data Storage</h2>
+<div>
+    All user data of online users will be deleted after 365 days without use (no login by the user).<br>
+    If you wish to have your data deleted before this period, please send a request to
+    <a href="mailto:contact@jemefaiscomprendre.com">contact@jemefaiscomprendre.com</a>.<br>
+    If you wish to delete your data yourself, you can do so directly in the application in Settings > User management > Delete my account.<br>
+    This will delete your account and all related data.
+</div>
+<h2>Revocation and Information on Rights</h2>
+<div>
+    <p>
+        Consent for data processing can be revoked at any time by contacting
+        <a href="mailto:contact@jemefaiscomprendre.com">contact@jemefaiscomprendre.com</a>.
+        In the event of revocation, the data of the respective user will be deleted.
+    </p>
+    <p>
+        Further information on your rights (right to information, deletion, etc.) can be found on the
+        <a href="https://www.cnil.fr/fr/reglement-europeen-protection-donnees" target="_blank" rel="noreferrer">CNIL GDPR info page</a>.
+        If you have any questions, you can contact <a href="mailto:contact@jemefaiscomprendre.com">contact@jemefaiscomprendre.com</a> at any time.
+    </p>
+</div>
+
+
+<div style="margin-bottom: 15em; margin-top: 2em"><a id="backLink2" href="../#about"> Back to the app </a></div>
+
+<script>
+    let url = new URL(window.location.href);
+    let backHash = url.searchParams.get("back") || "about";
+    document.getElementById('backLink1').href = '../#' + backHash;
+    document.getElementById('backLink2').href = '../#' + backHash;
+    if (window.location.hash) {
+        console.warn(document.getElementById(window.location.hash.replace('#', '')));
+        document.getElementById(window.location.hash.replace('#', '')).style = 'outline: 3px solid lightblue';
+    }
+</script>
+</body>
+</html>
