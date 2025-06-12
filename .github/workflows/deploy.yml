@@ -1,0 +1,25 @@
+name: Deploy On Test Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔹 Vérifier le dépôt
+        uses: actions/checkout@v3
+
+      - name: 🚀 Déployer via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /var/www/jmfc
+            git pull
+            echo "✅ Déploiement terminé !"
