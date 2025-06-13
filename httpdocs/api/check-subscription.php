@@ -9,6 +9,7 @@ error_log('GET params: ' . json_encode($_GET));
 header('Content-Type: application/json');
 
 $config = require_once '/var/www/jmfc/config/config.php';
+dd($config);
 
 // CORS configuration
 header('Access-Control-Allow-Origin: ' . $config['allowed_origins'][0]);
