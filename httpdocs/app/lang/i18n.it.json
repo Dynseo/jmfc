@@ -209,7 +209,7 @@
     "areUrl": "ARE URL",
     "openHABUrl": "URL OpenHAB",
     "fetchItems": "Recupera elementi",
-    "selectAction": "Seleziona l’azione",
+    "selectAction": "Seleziona l'azione",
     "unlockApplication": "Sblocca l'applicazione",
     "inputPasscode": "Codice di input",
     "useButtonsOrKeyboard": "(usa pulsanti o tastiera)",
@@ -849,7 +849,7 @@
     "iAmADAD04": "La nostra applicazione, facile da usare, è un supporto per genitori e insegnanti specializzati per aiutare nella comunicazione.",
     "iAmADAD05": "Grazie alla sua interfaccia intuitiva, l'app utilizza basi di comunicazione e comprensione attraverso pittogrammi e sintesi vocale. Puoi anche creare frasi con foto e suoni personalizzati.",
     "iAmADAD06": "Include una libreria di immagini e pittogrammi che puoi arricchire personalmente con la persona autistica.",
-    "iAmADAD07": "Gli scambi sono facilitati in modo personalizzato, per esempio, ‘Voglio andare a scuola con mamma’ con la vera foto della scuola e di mamma, accompagnate dalla sua voce.",
+    "iAmADAD07": "Gli scambi sono facilitati in modo personalizzato, per esempio, 'Voglio andare a scuola con mamma' con la vera foto della scuola e di mamma, accompagnate dalla sua voce.",
     "iAmADAD08": "L'app è compatibile con tutti i dispositivi: Android, iOS, PC, tablet e può essere utilizzata con gli stessi dati di accesso su tutti questi dispositivi.",
     "langApp": "it",
     "ToSeeDocumentation": "Documentazione",
@@ -864,5 +864,18 @@
     "thisFeaturerequiresAUserAccount": "Questa funzionalità richiede un account utente. Accedi o crea un account per accedervi.",
     "createAccount": "Crea un account",
     "showGlobalGrid": "Mostra la griglia globale",
-    "selectGlobalGrid": "Seleziona la griglia globale"
+    "selectGlobalGrid": "Seleziona la griglia globale",
+    "subscription": {
+        "title": "Abbonamento",
+        "loading": "Caricamento informazioni abbonamento...",
+        "active": "Abbonamento Attivo",
+        "expires": "Scade il {date}",
+        "purchase": "Acquista",
+        "monthly": "Mensile",
+        "quarterly": "Trimestrale",
+        "semiannual": "Semestrale",
+        "annual": "Annuale",
+        "mobile_only": "Gli abbonamenti sono disponibili solo su dispositivi mobili",
+        "init_error": "Impossibile inizializzare il sistema di abbonamento"
+    }
 }

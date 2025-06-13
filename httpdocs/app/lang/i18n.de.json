@@ -849,7 +849,7 @@
     "iAmADAD04": "Unsere einfach zu bedienende App ist eine Unterstützung für Eltern und spezialisierte Lehrkräfte, um die Kommunikation zu erleichtern.",
     "iAmADAD05": "Dank ihrer intuitiven Benutzeroberfläche nutzt die App Kommunikations- und Verständigungsgrundlagen mittels Piktogrammen und Sprachsynthese. Zudem können Sätze mit eigenen Fotos und Sounds gebildet werden.",
     "iAmADAD06": "Die App enthält eine Bibliothek mit Bildern und Piktogrammen, die persönlich mit der autistischen Person erweitert werden kann.",
-    "iAmADAD07": "Die Kommunikation wird auf individuelle Weise erleichtert, beispielsweise „Ich möchte mit Mama zur Schule gehen“ mit einem echten Foto der Schule und von Mama, begleitet von ihrer Stimme.",
+    "iAmADAD07": "Die Kommunikation wird auf individuelle Weise erleichtert, beispielsweise "Ich möchte mit Mama zur Schule gehen" mit einem echten Foto der Schule und von Mama, begleitet von ihrer Stimme.",
     "iAmADAD08": "Die App ist mit allen Geräten kompatibel: Android, iOS, PC, Tablet, und kann mit denselben Anmeldedaten auf allen Plattformen genutzt werden.",
     "langApp": "de",
     "ToSeeDocumentation": "Dokumentation",
@@ -864,5 +864,18 @@
     "thisFeaturerequiresAUserAccount": "Diese Funktion erfordert ein Benutzerkonto. Bitte melden Sie sich an oder erstellen Sie ein Konto, um darauf zuzugreifen.",
     "createAccount": "Konto erstellen",
     "showGlobalGrid": "Globale Raster anzeigen",
-    "selectGlobalGrid": "Globale Raster auswählen"
+    "selectGlobalGrid": "Globale Raster auswählen",
+    "subscription": {
+        "title": "Abonnement",
+        "loading": "Lade Abonnementinformationen...",
+        "active": "Aktives Abonnement",
+        "expires": "Läuft ab am {date}",
+        "purchase": "Kaufen",
+        "monthly": "Monatlich",
+        "quarterly": "Vierteljährlich",
+        "semiannual": "Halbjährlich",
+        "annual": "Jährlich",
+        "mobile_only": "Abonnements sind nur auf mobilen Geräten verfügbar",
+        "init_error": "Fehler beim Initialisieren des Abonnement-Systems"
+    }
 }

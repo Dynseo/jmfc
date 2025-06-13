@@ -849,7 +849,7 @@
     "iAmADAD04": "Nuestra aplicación, fácil de usar, es un soporte para padres y docentes especializados para ayudar a hacerse entender.",
     "iAmADAD05": "Gracias a su interfaz intuitiva, la aplicación utiliza bases de comunicación y comprensión a través de pictogramas y síntesis vocal. También puedes formar frases con fotos y sonidos personalizados.",
     "iAmADAD06": "Incluye una biblioteca de imágenes y pictogramas que puedes enriquecer personalmente con la persona autista.",
-    "iAmADAD07": "Los intercambios están personalizados, por ejemplo, ‘Quiero ir a la escuela con mamá’ con la foto real de la escuela y de mamá, acompañadas de su voz.",
+    "iAmADAD07": "Los intercambios están personalizados, por ejemplo, 'Quiero ir a la escuela con mamá' con la foto real de la escuela y de mamá, acompañadas de su voz.",
     "iAmADAD08": "La aplicación es compatible con todos los dispositivos: Android, iOS, PC, tablet y puede utilizarse con los mismos credenciales de acceso en todos estos dispositivos.",
     "langApp": "es",
     "ToSeeDocumentation": "Documentación",
@@ -864,5 +864,18 @@
     "thisFeaturerequiresAUserAccount": "Esta función requiere una cuenta de usuario. Inicia sesión o crea una cuenta para acceder.",
     "createAccount": "Crear una cuenta",
     "showGlobalGrid": "Mostrar la cuadrícula global",
-    "selectGlobalGrid": "Seleccionar la cuadrícula global"
+    "selectGlobalGrid": "Seleccionar la cuadrícula global",
+    "subscription": {
+        "title": "Suscripción",
+        "loading": "Cargando información de suscripción...",
+        "active": "Suscripción Activa",
+        "expires": "Expira el {date}",
+        "purchase": "Comprar",
+        "monthly": "Mensual",
+        "quarterly": "Trimestral",
+        "semiannual": "Semestral",
+        "annual": "Anual",
+        "mobile_only": "Las suscripciones solo están disponibles en dispositivos móviles",
+        "init_error": "Error al inicializar el sistema de suscripción"
+    }
 }
