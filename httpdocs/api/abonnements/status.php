@@ -1,12 +1,18 @@
 <?php
+require_once '../session.php';
 header('Content-Type: application/json');
-require_once '../../../config/config.php';
 
 // Vérification de l'authentification
-session_start();
-if (!isset($_SESSION['user'])) {
+if (!isSessionValid()) {
     http_response_code(401);
     echo json_encode(['error' => 'Non autorisé']);
+    exit;
+}
+
+$userSession = getUserSession();
+if (!$userSession) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Session invalide']);
     exit;
 }
 
@@ -35,7 +41,7 @@ try {
         LIMIT 1
     ");
     
-    $stmt->execute([$_SESSION['user']['key_name']]);
+    $stmt->execute([$userSession['key_name']]);
     $abonnement = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$abonnement) {

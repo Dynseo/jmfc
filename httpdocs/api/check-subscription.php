@@ -1,4 +1,6 @@
 <?php
+require_once 'session.php';
+
 // debug
 error_log('API Called - Request Details:');
 error_log('Headers: ' . json_encode(getallheaders()));
@@ -35,7 +37,6 @@ if (!$auth_header || !preg_match('/Bearer\s+(.*)$/i', $auth_header, $matches)) {
 }
 
 $token = $matches[1];
-
 $username = isset($_GET['username']) ? $_GET['username'] : '';
 
 if (empty($username)) {
@@ -43,6 +44,9 @@ if (empty($username)) {
     echo json_encode(['error' => 'Username required']);
     exit;
 }
+
+// Set or update session
+setUserSession($username, $token);
 
 try {
     $pdo = new PDO(
