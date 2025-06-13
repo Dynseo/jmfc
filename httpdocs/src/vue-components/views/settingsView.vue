@@ -141,6 +141,12 @@
                     </div>
                 </div>
             </div>
+            <div class="srow">
+                <div class="eleven columns">
+                    <h3 class="mt-2">{{ $t('subscription.title') }}</h3>
+                    <subscription-manager @subscription-updated="handleSubscriptionUpdate"/>
+                </div>
+            </div>
         </div>
          <div class="bottom-spacer"></div>
     </div>
@@ -162,13 +168,14 @@
     import {speechServiceExternal} from "../../js/service/speechServiceExternal.js";
     import { gridUtil } from '../../js/util/gridUtil.js';
     import {helpService} from "../../js/service/helpService";
+    import SubscriptionManager from "../components/subscriptionManager.vue";
 
     
     let KEY_SETTINGS_SHOW_ALL_VOICES = "KEY_SETTINGS_SHOW_ALL_VOICES";
     let KEY_SETTINGS_SHOW_ALL_CONTENTLANGS = "KEY_SETTINGS_SHOW_ALL_CONTENTLANGS";
 
     export default {
-        components: {SliderInput, GlobalInputOptions, Accordion, HeaderIcon},
+        components: {SliderInput, GlobalInputOptions, Accordion, HeaderIcon, SubscriptionManager},
         props: [],
         data() {
             return {
@@ -316,6 +323,10 @@
                 speechServiceExternal.cacheAll(allGrids, externalVoice, (progress) => {
                     this.externalVoiceCacheProgress = progress;
                 });
+            },
+            handleSubscriptionUpdate() {
+                // Refresh any necessary data when subscription changes
+                this.$emit('subscription-updated');
             }
         },
         async mounted() {
