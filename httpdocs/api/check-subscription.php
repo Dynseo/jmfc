@@ -8,8 +8,29 @@ error_log('GET params: ' . json_encode($_GET));
 
 header('Content-Type: application/json');
 
-$config = require_once '/var/www/jmfc/config/config.php';
-dd($config);
+// Load configuration with error handling
+$configPath = '/var/www/jmfc/config/config.php';
+if (!is_readable($configPath)) {
+    error_log("Config file is not readable: " . $configPath);
+    http_response_code(500);
+    echo json_encode(['error' => 'Configuration error', 'message' => 'Server configuration not accessible']);
+    exit;
+}
+
+$config = include $configPath;
+if ($config === false) {
+    error_log("Failed to include config file: " . $configPath);
+    http_response_code(500);
+    echo json_encode(['error' => 'Configuration error', 'message' => 'Failed to load server configuration']);
+    exit;
+}
+
+if (!is_array($config)) {
+    error_log("Config file did not return an array. Type: " . gettype($config));
+    http_response_code(500);
+    echo json_encode(['error' => 'Configuration error', 'message' => 'Invalid server configuration format']);
+    exit;
+}
 
 // CORS configuration
 header('Access-Control-Allow-Origin: ' . $config['allowed_origins'][0]);
