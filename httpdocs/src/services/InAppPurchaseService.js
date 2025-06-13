@@ -20,11 +20,23 @@ class InAppPurchaseService {
                 type: 'paid subscription'
             }
         };
+        this.isInitialized = false;
     }
 
     async initialize() {
         try {
-            await InAppPurchase.init();
+            // Vérifier si nous sommes dans un environnement mobile
+            if (!window.cordova) {
+                console.log('Environnement non-mobile détecté, les achats in-app ne sont pas disponibles');
+                return false;
+            }
+
+            // Attendre que le plugin soit disponible
+            await this.waitForPlugin();
+            
+            // Initialiser le plugin
+            await window.cordova.plugins.InAppPurchase.init();
+            this.isInitialized = true;
             return true;
         } catch (error) {
             console.error('Erreur lors de l\'initialisation des achats in-app:', error);
@@ -32,10 +44,35 @@ class InAppPurchaseService {
         }
     }
 
+    waitForPlugin() {
+        return new Promise((resolve, reject) => {
+            let attempts = 0;
+            const maxAttempts = 10;
+            const interval = 500; // 500ms entre chaque tentative
+
+            const checkPlugin = () => {
+                if (window.cordova && window.cordova.plugins && window.cordova.plugins.InAppPurchase) {
+                    resolve();
+                } else if (attempts >= maxAttempts) {
+                    reject(new Error('Plugin InAppPurchase non disponible après plusieurs tentatives'));
+                } else {
+                    attempts++;
+                    setTimeout(checkPlugin, interval);
+                }
+            };
+
+            checkPlugin();
+        });
+    }
+
     async getProducts() {
+        if (!this.isInitialized) {
+            throw new Error('Le service d\'achat in-app n\'est pas initialisé');
+        }
+
         try {
             const productIds = Object.values(this.products).map(p => p.id);
-            const products = await InAppPurchase.getProducts(productIds);
+            const products = await window.cordova.plugins.InAppPurchase.getProducts(productIds);
             return products;
         } catch (error) {
             console.error('Erreur lors de la récupération des produits:', error);
@@ -44,13 +81,17 @@ class InAppPurchaseService {
     }
 
     async purchaseSubscription(frequence) {
+        if (!this.isInitialized) {
+            throw new Error('Le service d\'achat in-app n\'est pas initialisé');
+        }
+
         try {
             const productId = this.products[frequence]?.id;
             if (!productId) {
                 throw new Error('Fréquence d\'abonnement invalide');
             }
 
-            const purchase = await InAppPurchase.order(productId);
+            const purchase = await window.cordova.plugins.InAppPurchase.order(productId);
             
             if (purchase && purchase.transaction) {
                 await this.verifyPurchase(purchase, frequence);
