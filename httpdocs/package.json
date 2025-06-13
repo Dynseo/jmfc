@@ -4,7 +4,10 @@
   "description": "Je Me Fais Comprendre app",
   "main": "index.js",
   "dependencies": {
+    "@capacitor/cli": "^7.3.0",
+    "@capacitor/core": "^7.3.0",
     "@klues/couch-auth": "^0.20.1",
+    "cordova-plugin-inapppurchase": "^1.2.0",
     "cors": "^2.8.5",
     "dotenv-flow": "^3.2.0",
     "express": "^4.19.2",

@@ -122,6 +122,21 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Section Abonnement -->
+                <div class="mt-5">
+                    <h3>
+                        <strong>{{ $t('subscription.title') }}</strong>
+                    </h3>
+                    <div class="row">
+                        <div class="col-12">
+                            <subscription-manager 
+                                @subscription-updated="handleSubscriptionUpdate"
+                                class="subscription-section"
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <!--<div class="info_bottom">
@@ -141,9 +156,13 @@
     import HeaderIcon from '../../vue-components/components/headerIcon.vue'
     import {helpService} from "../../js/service/helpService";
     import {loginService} from "../../js/service/loginService";
+    import SubscriptionManager from '../SubscriptionManager.vue';
 
     export default {
-        components: {HeaderIcon},
+        components: {
+            HeaderIcon,
+            SubscriptionManager
+        },
         props: [],
         data() {
             return {
@@ -201,6 +220,10 @@
             },
             goToPopup(index) {
                 this.currentPopupIndex = index;
+            },
+            handleSubscriptionUpdate() {
+                // Rafraîchir la page ou mettre à jour l'état si nécessaire
+                this.$forceUpdate();
             }
         },
         mounted() {
@@ -416,4 +439,16 @@
         width: 100%;
         height: 100%;
     }   
+
+    .subscription-section {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .mt-5 {
+        margin-top: 3rem;
+    }
 </style>
