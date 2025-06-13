@@ -43,9 +43,9 @@ try {
 
     // Connexion à la base de données
     $pdo = new PDO(
-        "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
-        DB_USER,
-        DB_PASS,
+        "mysql:host={$config['db']['host']};dbname={$config['db']['name']}",
+        $config['db']['user'],
+        $config['db']['pass'],
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
 
