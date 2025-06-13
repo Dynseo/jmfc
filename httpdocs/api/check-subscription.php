@@ -8,11 +8,7 @@ error_log('GET params: ' . json_encode($_GET));
 
 header('Content-Type: application/json');
 
-// Debug config loading
-error_log('Attempting to load config from: /var/www/jmfc/config/config.php');
 $config = require_once '/var/www/jmfc/config/config.php';
-error_log('Config loaded. Type: ' . gettype($config));
-error_log('Config content: ' . json_encode($config));
 
 // CORS configuration
 header('Access-Control-Allow-Origin: ' . $config['allowed_origins'][0]);
