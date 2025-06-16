@@ -3,12 +3,12 @@ if (!process.argv[2] || !process.argv[2].trim()) {
     console.log("node couchDbCompact.js <COUCHDB_URL> ['compact'] [singleDatabaseNameToCompact]");
     console.log("----");
     console.log("Examples:");
-    console.log("node couchDbCompact.js http://admin:admin@localhost:5984 ... for just analyzing current disk usage");
-    console.log("node couchDbCompact.js http://admin:admin@localhost:5984 compact ... for compacting all databases");
+    console.log("node couchDbCompact.js http://admin:admin@jmfc.dynseo.com:6984 ... for just analyzing current disk usage");
+    console.log("node couchDbCompact.js http://admin:admin@jmfc.dynseo.com:6984 compact ... for compacting all databases");
     return;
 }
 
-let dbUrl = process.argv[2] || 'http://admin:admin@localhost:5984';
+let dbUrl = process.argv[2] || 'http://admin:admin@jmfc.dynseo.com:6984';
 let doCompact = process.argv[3] && process.argv[3].trim() === 'compact';
 let singleCompactDBName = process.argv[4] || null;
 console.log('using url: ' + dbUrl);

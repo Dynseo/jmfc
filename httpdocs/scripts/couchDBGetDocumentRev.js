@@ -6,7 +6,7 @@ if (!process.argv[2] || !process.argv[3] || !process.argv[4]) {
     return;
 }
 
-let dbUrl = process.argv[2] || 'http://admin:admin@localhost:5984';
+let dbUrl = process.argv[2] || 'http://admin:admin@jmfc.dynseo.com:6984';
 let dbName = process.argv[3] || null;
 let docId = process.argv[4] || null;
 let revId = process.argv[5] || null;

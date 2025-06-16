@@ -3,11 +3,11 @@ if (!process.argv[2]) {
     console.log('node couchDBCleanupDeleted.js <COUCHDB_URL> [db-name]');
     console.log('----');
     console.log('Examples:');
-    console.log('node couchDBCleanupDeleted.js https://admin:example@localhost:5984 jmfc-data$xyz');
+    console.log('node couchDBCleanupDeleted.js https://admin:admin@jmfc.dynseo.com:6984 jmfc-data$xyz');
     return;
 }
 
-let couchUrl = process.argv[2] || 'http://admin:admin@localhost:5984';
+let couchUrl = process.argv[2] || 'http://admin:admin@jmfc.dynseo.com:6984';
 let customDbName = process.argv[3] || null;
 
 couchUrl = couchUrl.trim();

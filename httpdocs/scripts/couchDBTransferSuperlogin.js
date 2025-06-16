@@ -5,8 +5,8 @@ if (!process.argv[2] || !process.argv[2].trim()) {
     console.log(`node couchDBTransferSuperlogin.js <COUCHDB_URL> [prod]`);
     console.log("----");
     console.log("Example:");
-    console.log(`node couchDBTransferSuperlogin.js http://admin:admin@localhost:5984`);
-    console.log(`node couchDBTransferSuperlogin.js https://admin:example@couchdb.jemefaiscomprendre.com`);
+    console.log(`node couchDBTransferSuperlogin.js http://admin:admin@jmfc.dynseo.com:6984`);
+    console.log(`node couchDBTransferSuperlogin.js https://admin:admin@jmfc.dynseo.com:6984`);
     console.log(`actual database changes are only done with second parameter "prod".`);
     return;
 }

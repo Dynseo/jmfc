@@ -5,13 +5,13 @@ if (!process.argv[2] || !process.argv[3]) {
     console.log(`node couchDBReplicateAllDbs.js <SOURCE_COUCHDB_URL> <TARGET_COUCHDB_URL> [onlynew]`);
     console.log("----");
     console.log("Example:");
-    console.log(`node couchDBReplicateAllDbs.js https://admin:admin@my.couchdb.org:6984 http://admin:admin@localhost:5984`);
+    console.log(`node couchDBReplicateAllDbs.js https://admin:admin@my.couchdb.org:6984 http://admin:admin@jmfc.dynseo.com:6984`);
     console.log(`All data is transferred from source to target, no changes in source.`);
     return;
 }
 
-let sourceDBUrl = process.argv[2] || 'http://admin:admin@localhost:5984';
-let targetDBUrl = process.argv[3] || 'http://admin:admin@localhost:5984';
+let sourceDBUrl = process.argv[2] || 'http://admin:admin@jmfc.dynseo.com:6984';
+let targetDBUrl = process.argv[3] || 'http://admin:admin@jmfc.dynseo.com:6984';
 let onlynew = process.argv[4] === 'onlynew';
 
 sourceDBUrl = sourceDBUrl.trim();
