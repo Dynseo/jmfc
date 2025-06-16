@@ -54,8 +54,7 @@ export default {
   async created() {
     try {
       // Vérifier si nous sommes sur mobile
-      //this.isMobile = window.cordova !== undefined;
-      this.isMobile = true;
+      this.isMobile = window.cordova !== undefined;
       
       if (this.isMobile) {
         await this.initialize();
