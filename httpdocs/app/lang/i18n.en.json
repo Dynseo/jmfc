@@ -458,7 +458,7 @@
         "ki": "Kikuyu",
         "lu": "Luba-Katanga",
         "rw": "Kinyarwanda",
-        "cu": "Church Slavic",
+        "cu": "Church Slavic",
         "ky": "Kirghiz",
         "rn": "Rundi",
         "kv": "Komi",
@@ -515,7 +515,7 @@
         "sg": "Sango",
         "sa": "Sanskrit",
         "sc": "Sardinian",
-        "gd": "Scottish Gaelic",
+        "gd": "Scottish Gaelic",
         "sv": "Swedish",
         "sr": "Serbian",
         "st": "Southern Sotho",
@@ -864,18 +864,5 @@
     "thisFeaturerequiresAUserAccount": "This feature requires a user account. Please log in or create an account to access it",
     "createAccount": "Create an account",
     "showGlobalGrid": "Show the global grid",
-    "selectGlobalGrid": "Select the global grid",
-    "subscription": {
-        "title": "Subscription",
-        "loading": "Loading subscription information...",
-        "active": "Active Subscription",
-        "expires": "Expires on {date}",
-        "purchase": "Purchase",
-        "monthly": "Monthly",
-        "quarterly": "Quarterly",
-        "semiannual": "Semi-annual",
-        "annual": "Annual",
-        "mobile_only": "Subscriptions are only available on mobile devices",
-        "init_error": "Failed to initialize subscription system"
-    }
+    "selectGlobalGrid": "Select the global grid"
 }
