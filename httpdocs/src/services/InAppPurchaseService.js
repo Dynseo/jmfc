@@ -106,7 +106,7 @@ class InAppPurchaseService {
 
     async verifyPurchase(purchase, frequence) {
         try {
-            const response = await fetch('/api/abonnements/verify.php', {
+            const response = await fetch('/api/abonnements/verify', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

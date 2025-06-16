@@ -86,7 +86,7 @@ export default {
     
     async checkActiveSubscription() {
       try {
-        const response = await fetch('/api/abonnements/status.php');
+        const response = await fetch('/api/abonnements/status');
         const data = await response.json();
         this.hasActiveSubscription = data.active;
         this.activeSubscription = data.subscription;
