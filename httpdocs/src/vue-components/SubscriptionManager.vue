@@ -46,20 +46,14 @@ export default {
       products: [],
       purchasing: false,
       hasActiveSubscription: false,
-      activeSubscription: null,
-      isMobile: false
+      activeSubscription: null
     };
   },
   
   async created() {
     try {
-      // Vérifier si nous sommes sur mobile
-      this.isMobile = window.cordova !== undefined;
-      
-      if (this.isMobile) {
-        await this.initialize();
-        await this.loadProducts();
-      }
+      await this.initialize();
+      await this.loadProducts();
       await this.checkActiveSubscription();
     } catch (error) {
       this.error = error.message;
@@ -77,10 +71,6 @@ export default {
     },
     
     async loadProducts() {
-      if (!this.isMobile) {
-        this.products = [];
-        return;
-      }
       this.products = await InAppPurchaseService.getProducts();
     },
     
@@ -96,11 +86,6 @@ export default {
     },
     
     async handlePurchase(frequence) {
-      if (!this.isMobile) {
-        this.error = this.$t('subscription.mobile_only');
-        return;
-      }
-
       this.purchasing = true;
       try {
         const purchase = await InAppPurchaseService.purchaseSubscription(frequence);

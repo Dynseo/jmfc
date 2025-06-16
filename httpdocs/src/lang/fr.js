@@ -9,7 +9,6 @@ export default {
         monthly: 'Abonnement mensuel',
         quarterly: 'Abonnement trimestriel',
         semiannual: 'Abonnement semestriel',
-        annual: 'Abonnement annuel',
-        mobile_only: 'Les achats in-app ne sont disponibles que sur les appareils mobiles'
+        annual: 'Abonnement annuel'
     }
 }; 
