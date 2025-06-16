@@ -168,7 +168,7 @@
     import {speechServiceExternal} from "../../js/service/speechServiceExternal.js";
     import { gridUtil } from '../../js/util/gridUtil.js';
     import {helpService} from "../../js/service/helpService";
-    import SubscriptionManager from "../components/SubscriptionManager.vue";
+    import SubscriptionManager from "../components/subscriptionManager.vue";
 
     
     let KEY_SETTINGS_SHOW_ALL_VOICES = "KEY_SETTINGS_SHOW_ALL_VOICES";
