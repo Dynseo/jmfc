@@ -9,7 +9,9 @@ header('Content-Type: application/json');
 $config = require_once '/var/www/jmfc/config/config.php';
 
 // CORS configuration
-header('Access-Control-Allow-Origin: *');
+if (in_array($_SERVER['HTTP_ORIGIN'] ?? '', $allowedOrigins, true)) {
+    header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+}
 header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Authorization, Content-Type');
 header('Access-Control-Allow-Credentials: true');
