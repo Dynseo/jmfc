@@ -2,12 +2,7 @@
 $config = require_once '/var/www/jmfc/config/config.php';
 
 // CORS configuration
-if (!empty($config['allowed_origins']) && is_array($config['allowed_origins'])) {
-    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-    if (in_array($origin, $config['allowed_origins'])) {
-        header('Access-Control-Allow-Origin: ' . $origin);
-    }
-}
+header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Authorization, Content-Type');
 header('Access-Control-Allow-Credentials: true');
