@@ -55,7 +55,7 @@
                 <h3>{{ $t('deletedElements') }}</h3>
                 <ul>
                     <li v-for="el in deletedElements" :key="el.id">
-                        <button @click="restoreElement(el.id)">{{ el.name || el.label || ('ID: ' + el.id) }}</button>
+                        <button @click="restoreElement(el.id)">{{ el.name }}</button>
                     </li>
                 </ul>
                 <button @click="showDeletedModal = false">{{ $t('close') }}</button>
@@ -608,6 +608,7 @@
 }
 .deleted-modal .modal-content {
     background: #fff;
+    color: #222; /* Correction : texte foncé pour lisibilité */
     padding: 2em;
     border-radius: 8px;
     min-width: 300px;
