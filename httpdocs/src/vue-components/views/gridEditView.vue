@@ -47,6 +47,22 @@
                 </div>
             </div>
         </div>
+        <div style="margin: 10px 0; text-align: right;">
+            <button @click="showDeletedModal = true" class="small danger">
+                <i class="fas fa-trash-restore"></i> {{ $t('showDeletedElements') }}
+            </button>
+        </div>
+        <div v-if="showDeletedModal" class="modal deleted-modal">
+            <div class="modal-content">
+                <h3>{{ $t('deletedElements') }}</h3>
+                <ul>
+                    <li v-for="el in deletedElements" :key="el.id">
+                        <button @click="restoreElement(el.id)">{{ el.name || el.label || ('ID: ' + el.id) }}</button>
+                    </li>
+                </ul>
+                <button @click="showDeletedModal = false">{{ $t('close') }}</button>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -101,7 +117,14 @@
                 showGrid: false,
                 constants: constants,
                 markedElement: null,
-                backgroundColor: 'white'
+                backgroundColor: 'white',
+                showDeletedModal: false
+            }
+        },
+        computed: {
+            deletedElements() {
+                if (!this.gridData || !this.gridData.gridElements) return [];
+                return this.gridData.gridElements.filter(e => e.deleted);
             }
         },
         components: {
@@ -551,5 +574,38 @@
     pointer-events: auto;
     text-decoration: line-through;
     background: repeating-linear-gradient(135deg, #eee, #eee 10px, #ccc 10px, #ccc 20px);
+}
+.deleted-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.deleted-modal .modal-content {
+    background: #fff;
+    padding: 2em;
+    border-radius: 8px;
+    min-width: 300px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+}
+.deleted-modal ul {
+    list-style: none;
+    padding: 0;
+}
+.deleted-modal li button {
+    background: #eee;
+    border: none;
+    padding: 0.5em 1em;
+    margin: 0.2em 0;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+}
+.deleted-modal li button:hover {
+    background: #cce5ff;
 }
 </style>

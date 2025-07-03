@@ -92,15 +92,8 @@ function Grid(gridContainerId, gridItemClass, options) {
         _gridElement = $("#" + gridDataParam.id);
 
         let metadata = await dataService.getMetadata();
-        for (let gridElement of gridDataParam.gridElements) {
+        for (let gridElement of gridDataParam.gridElements.filter(e => !e.deleted)) {
             let html = gridElement.toHTML(metadata);
-            // Ajoute une classe CSS spéciale si l'élément est supprimé
-            if (gridElement.deleted) {
-                // Ajoute la classe 'deleted-item' au HTML généré
-                // Supposons que toHTML retourne une string HTML avec un conteneur principal
-                // On injecte la classe sur le premier tag
-                html = html.replace(/class=(['"][^'"]*)/, "class=$1 deleted-item");
-            }
             _gridElement.append(html);
         }
 
