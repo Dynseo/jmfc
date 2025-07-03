@@ -189,7 +189,10 @@
             restoreElement(id) {
                 let thiz = this;
                 gridInstance.restoreElement(id).then(newGridData => {
-                    thiz.gridData = newGridData;
+                    thiz.gridData = JSON.parse(JSON.stringify(newGridData));
+                    // Force la fermeture/réouverture de la modale pour rafraîchir la liste
+                    thiz.showDeletedModal = false;
+                    setTimeout(() => { thiz.showDeletedModal = true; }, 0);
                 });
             },
             newElement(type) {
