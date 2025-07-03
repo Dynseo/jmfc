@@ -183,11 +183,6 @@
                 gridInstance.removeElement(id).then(newGridData => {
                     thiz.gridData = newGridData;
                 });
-                // On ajoute l'élément supprimé à la liste des éléments supprimés
-                let deletedElement = thiz.gridData.gridElements.filter(e => e.id === id)[0];
-                if (deletedElement) {
-                    thiz.deletedElements.push(deletedElement);
-                }
             },
             restoreElement(id) {
                 let thiz = this;
