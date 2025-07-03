@@ -240,6 +240,8 @@
     "importWords": "Import words",
     "words": "Words:",
     "editingOff": "Editing off",
+    "showDeletedElements": "Show deleted elements",
+    "deletedElements": "Deleted elements",
     "undo": "Undo",
     "redo": "Redo",
     "editingOn": "Editing on",

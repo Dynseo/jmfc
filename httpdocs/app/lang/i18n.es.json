@@ -240,6 +240,8 @@
     "importWords": "Importar palabras",
     "words": "Palabras:",
     "editingOff": "Desactivar edición",
+    "showDeletedElements": "Mostrar elementos eliminados",
+    "deletedElements": "Elementos eliminados",
     "undo": "Deshacer",
     "redo": "Rehacer",
     "editingOn": "Editar",

@@ -240,6 +240,8 @@
     "importWords": "Wörter importieren",
     "words": "Wörter:",
     "editingOff": "Bearbeiten aus",
+    "showDeletedElements": "Gelöschte Elemente anzeigen",
+    "deletedElements": "Gelöschte Elemente",
     "undo": "Rückgängig",
     "redo": "Wiederherstellen",
     "editingOn": "Bearbeiten ein",
