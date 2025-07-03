@@ -12,6 +12,9 @@
             <div class="spaced btn-group">
                 <button tabindex="31" @click="undo" :aria-label="$t('undo')" :disabled="!canUndo || doingUndoRedo" class="small"><i class="fas fa-undo"></i> <span class="hide-mobile">{{ $t('undo') }}</span></button>
                 <button tabindex="32" @click="redo"  :aria-label="$t('redo')" :disabled="!canRedo || doingUndoRedo" class="small spaced"><i class="fas fa-redo"></i> <span class="hide-mobile">{{ $t('redo') }}</span></button>
+                <button @click="showDeletedModal = true" class="small danger spaced">
+                    <i class="fas fa-trash-restore"></i> {{ $t('showDeletedElements') }}
+                </button>
             </div>
         </header>
         <div>
@@ -46,11 +49,6 @@
     background-image: linear-gradient(to bottom, grey 1px, transparent 1px);">
                 </div>
             </div>
-        </div>
-        <div style="margin: 10px 0; text-align: right;">
-            <button @click="showDeletedModal = true" class="small danger">
-                <i class="fas fa-trash-restore"></i> {{ $t('showDeletedElements') }}
-            </button>
         </div>
         <div v-if="showDeletedModal" class="modal deleted-modal">
             <div class="modal-content">
