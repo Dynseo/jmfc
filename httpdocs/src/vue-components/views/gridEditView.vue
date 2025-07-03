@@ -608,18 +608,23 @@
 }
 .deleted-modal .modal-content {
     background: #fff;
-    color: #222 !important;
+    color: #222;
     padding: 2em;
     border-radius: 8px;
     min-width: 300px;
     box-shadow: 0 2px 16px rgba(0,0,0,0.2);
 }
+.deleted-modal h3 {
+    color: #222;
+}
+
 .deleted-modal ul {
     list-style: none;
     padding: 0;
 }
 .deleted-modal li button {
     background: #eee;
+    color: #222;
     border: none;
     padding: 0.5em 1em;
     margin: 0.2em 0;
@@ -630,5 +635,6 @@
 }
 .deleted-modal li button:hover {
     background: #cce5ff;
+    color: #004085;
 }
 </style>
