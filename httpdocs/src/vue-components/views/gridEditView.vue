@@ -118,13 +118,13 @@
                 constants: constants,
                 markedElement: null,
                 backgroundColor: 'white',
-                showDeletedModal: false,
-                deletedElements: [],
+                showDeletedModal: false
             }
         },
         computed: {
             deletedElements() {
-                return this.deletedElements;
+                if (!this.gridData || !this.gridData.gridElements) return [];
+                return this.gridData.gridElements.filter(e => !!e.deleted);
             }
         },
         components: {
@@ -193,9 +193,7 @@
                 let thiz = this;
                 gridInstance.restoreElement(id).then(newGridData => {
                     thiz.gridData = JSON.parse(JSON.stringify(newGridData));
-                    // Force la fermeture/réouverture de la modale pour rafraîchir la liste
                     thiz.showDeletedModal = false;
-                    setTimeout(() => { thiz.showDeletedModal = true; }, 0);
                 });
             },
             newElement(type) {
