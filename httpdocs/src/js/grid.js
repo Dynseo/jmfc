@@ -94,6 +94,13 @@ function Grid(gridContainerId, gridItemClass, options) {
         let metadata = await dataService.getMetadata();
         for (let gridElement of gridDataParam.gridElements) {
             let html = gridElement.toHTML(metadata);
+            // Ajoute une classe CSS spéciale si l'élément est supprimé
+            if (gridElement.deleted) {
+                // Ajoute la classe 'deleted-item' au HTML généré
+                // Supposons que toHTML retourne une string HTML avec un conteneur principal
+                // On injecte la classe sur le premier tag
+                html = html.replace(/class=(['"][^'"]*)/, "class=$1 deleted-item");
+            }
             _gridElement.append(html);
         }
 
@@ -260,7 +267,30 @@ function Grid(gridContainerId, gridItemClass, options) {
     thiz.removeElement = function (idToRemove) {
         notifyLayoutChangeStart();
 
-        _gridData.gridElements = _gridData.gridElements.filter((el) => el.id !== idToRemove);
+        // Soft delete : on marque l'élément comme supprimé
+        _gridData.gridElements = _gridData.gridElements.map((el) => {
+            if (el.id === idToRemove) {
+                return { ...el, deleted: true };
+            }
+            return el;
+        });
+        return init(_gridData)
+            .then(() => {
+                return handleLayoutChange();
+            })
+            .then(() => {
+                return Promise.resolve(_gridData);
+            });
+    };
+
+    thiz.restoreElement = function (idToRestore) {
+        notifyLayoutChangeStart();
+        _gridData.gridElements = _gridData.gridElements.map((el) => {
+            if (el.id === idToRestore) {
+                return { ...el, deleted: false };
+            }
+            return el;
+        });
         return init(_gridData)
             .then(() => {
                 return handleLayoutChange();

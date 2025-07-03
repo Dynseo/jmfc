@@ -161,6 +161,12 @@
                     thiz.gridData = newGridData;
                 });
             },
+            restoreElement(id) {
+                let thiz = this;
+                gridInstance.restoreElement(id).then(newGridData => {
+                    thiz.gridData = newGridData;
+                });
+            },
             newElement(type) {
                 if (type === GridElement.ELEMENT_TYPE_NORMAL) {
                     this.editElementId = null;
@@ -375,13 +381,12 @@
         };
 
         var itemsElemNormal = {
-            CONTEXT_ACTION_EDIT: {name: i18nService.t('edit'), icon: "fas fa-edit"},
-            CONTEXT_ACTION_DELETE: {name: i18nService.t('delete'), icon: "far fa-trash-alt"},
-            CONTEXT_ACTION_DUPLICATE: {name: i18nService.t('clone'), icon: "far fa-clone"},
+            CONTEXT_ACTION_EDIT: {name: i18nService.t('edit'), icon: "fas fa-edit", visible: () => !vueApp.markedElement?.deleted},
+            CONTEXT_ACTION_DELETE: {name: i18nService.t('delete'), icon: "far fa-trash-alt", visible: () => !vueApp.markedElement?.deleted},
+            CONTEXT_ACTION_DUPLICATE: {name: i18nService.t('clone'), icon: "far fa-clone", visible: () => !vueApp.markedElement?.deleted},
+            CONTEXT_ACTION_RESTORE: {name: i18nService.t('restore'), icon: "fas fa-undo", visible: () => !!vueApp.markedElement?.deleted},
             SEP1: "---------",
-            /*** CONTEXT_GRID_NAVIGATION: {name: i18nService.t('navigateToOtherGrid'), icon: "fas fa-arrow-right"}, */
-            CONTEXT_MOVE_TO: {name: i18nService.t('moveElementToOtherGrid'), icon: "fas fa-file-export"},
-            /*** CONTEXT_ACTION_DO_ACTION: {name: i18nService.t('doElementAction'), icon: "fas fa-bolt"}, */
+            CONTEXT_MOVE_TO: {name: i18nService.t('moveElementToOtherGrid'), icon: "fas fa-file-export", visible: () => !vueApp.markedElement?.deleted},
         };
 
         let visibleFn = () => !!vueApp.markedElement;
@@ -528,6 +533,10 @@
                 case CONTEXT_SEARCH:
                     MainVue.showSearchModal();
                     break;
+                case 'CONTEXT_ACTION_RESTORE':
+                    vueApp.restoreElement(elementId || vueApp.markedElement.id);
+                    vueApp.markElement(null);
+                    break;
             }
         }
     }
@@ -536,4 +545,11 @@
 </script>
 
 <style scoped>
+.deleted-item {
+    opacity: 0.5;
+    filter: grayscale(1);
+    pointer-events: auto;
+    text-decoration: line-through;
+    background: repeating-linear-gradient(135deg, #eee, #eee 10px, #ccc 10px, #ccc 20px);
+}
 </style>
