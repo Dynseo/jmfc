@@ -193,6 +193,8 @@
                 let thiz = this;
                 gridInstance.restoreElement(id).then(newGridData => {
                     thiz.gridData = JSON.parse(JSON.stringify(newGridData));
+                    // Diagnostic : log l'état des éléments après restauration
+                    console.log('Éléments après restauration:', thiz.gridData.gridElements);
                     thiz.showDeletedModal = false;
                 });
             },
