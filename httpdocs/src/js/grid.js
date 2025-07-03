@@ -422,6 +422,7 @@ function Grid(gridContainerId, gridItemClass, options) {
             //update layout specific data
             _gridData.rowCount = _gridRows;
             _gridData.minColumnCount = _minGridColumns;
+            // Ajoute les éléments présents dans la grille UI
             _gridListInstance.items.forEach(function (item) {
                 var currentId = item.$element.attr("data-id");
                 var existingElem = _gridData.gridElements.filter((el) => el.id === currentId)[0];
@@ -431,6 +432,9 @@ function Grid(gridContainerId, gridItemClass, options) {
                 existingElem.width = item.w;
                 newElems.push(existingElem);
             });
+            // Ajoute les éléments supprimés (soft delete) qui ne sont pas dans la grille UI
+            const deletedElems = _gridData.gridElements.filter(el => el.deleted && !newElems.some(e => e.id === el.id));
+            newElems = newElems.concat(deletedElems);
             _gridData.gridElements = newElems;
             resolve(_gridData);
         });
