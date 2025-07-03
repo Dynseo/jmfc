@@ -118,13 +118,16 @@
                 constants: constants,
                 markedElement: null,
                 backgroundColor: 'white',
-                showDeletedModal: false,
-                deletedElements: [],
+                showDeletedModal: false
             }
         },
         computed: {
             deletedElements() {
-                return this.deletedElements;
+                if (!this.gridData || !this.gridData.gridElements) return [];
+                // Diagnostic : log la liste des éléments supprimés
+                const deleted = this.gridData.gridElements.filter(e => !!e.deleted);
+                console.log('deletedElements computed:', deleted);
+                return deleted;
             }
         },
         components: {
@@ -181,18 +184,12 @@
             removeElement(id) {
                 let thiz = this;
                 gridInstance.removeElement(id).then(newGridData => {
-                    thiz.gridData = newGridData;
+                    thiz.gridData = JSON.parse(JSON.stringify(newGridData));
+                    // Diagnostic : log l'état des éléments après suppression
+                    console.log('Éléments après suppression:', thiz.gridData.gridElements);
                 });
-                // On ajoute l'élément supprimé à la liste des éléments supprimés
-                let deletedElement = thiz.gridData.gridElements.filter(e => e.id === id)[0];
-                if (deletedElement) {
-                    thiz.deletedElements.push(deletedElement);
-                }
             },
             restoreElement(id) {
-                console.log('restoring element with id: ' + id);
-                // On retire l'élément de la liste des éléments supprimés
-                this.deletedElements = this.deletedElements.filter(el => el.id !== id);
                 let thiz = this;
                 gridInstance.restoreElement(id).then(newGridData => {
                     thiz.gridData = JSON.parse(JSON.stringify(newGridData));
