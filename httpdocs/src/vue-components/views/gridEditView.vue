@@ -183,11 +183,18 @@
             },
             removeElement(id) {
                 let thiz = this;
-                gridInstance.removeElement(id).then(newGridData => {
-                    thiz.gridData = JSON.parse(JSON.stringify(newGridData));
-                    // Diagnostic : log l'état des éléments après suppression
-                    console.log('Éléments après suppression:', thiz.gridData.gridElements);
+                this.gridData.gridElements = this.gridData.gridElements.map((el) => {
+                    if (el.id === id) {
+                        return { ...el, deleted: true };
+                    }
+                    return el;
                 });
+                // this.gridData.gridElements = this.gridData.gridElements.map(el => ({ ...el, deleted: true }));
+                // gridInstance.removeElement(id).then(newGridData => {
+                //     thiz.gridData = JSON.parse(JSON.stringify(newGridData));
+                //     // Diagnostic : log l'état des éléments après suppression
+                // });
+                console.log('Éléments après suppression:', thiz.gridData.gridElements);
             },
             restoreElement(id) {
                 let thiz = this;
