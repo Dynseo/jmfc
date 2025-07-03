@@ -123,8 +123,10 @@
         },
         computed: {
             deletedElements() {
-                if (!this.gridData || !this.gridData.gridElements) return [];
-                return this.gridData.gridElements.filter(e => e.deleted);
+                // Toujours prendre la source la plus à jour
+                let elements = (this.gridData && this.gridData.gridElements) ? this.gridData.gridElements : [];
+                // On retourne tous les éléments marqués deleted
+                return elements.filter(e => !!e.deleted);
             }
         },
         components: {
