@@ -199,12 +199,19 @@
             },
             restoreElement(id) {
                 let thiz = this;
-                gridInstance.restoreElement(id).then(newGridData => {
-                    thiz.gridData = JSON.parse(JSON.stringify(newGridData));
-                    // Diagnostic : log l'état des éléments après restauration
-                    console.log('Éléments après restauration:', thiz.gridData.gridElements);
-                    thiz.showDeletedModal = false;
+                this.gridData.gridElements = this.gridData.gridElements.map((el) => {
+                    if (el.id === id) {
+                        return { ...el, deleted: false };
+                    }
+                    return el;
                 });
+                gridInstance.updateGridWithUndo(this.gridData);
+                // gridInstance.restoreElement(id).then(newGridData => {
+                //     thiz.gridData = JSON.parse(JSON.stringify(newGridData));
+                //     // Diagnostic : log l'état des éléments après restauration
+                //     thiz.showDeletedModal = false;
+                // });
+                console.log('Éléments après restauration:', thiz.gridData.gridElements);
             },
             newElement(type) {
                 if (type === GridElement.ELEMENT_TYPE_NORMAL) {
