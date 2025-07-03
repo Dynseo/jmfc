@@ -189,6 +189,7 @@
                     }
                     return el;
                 });
+                gridInstance.updateGridWithUndo(this.gridData);
                 // this.gridData.gridElements = this.gridData.gridElements.map(el => ({ ...el, deleted: true }));
                 // gridInstance.removeElement(id).then(newGridData => {
                 //     thiz.gridData = JSON.parse(JSON.stringify(newGridData));
