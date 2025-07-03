@@ -55,7 +55,7 @@
                 <h3>{{ $t('deletedElements') }}</h3>
                 <ul>
                     <li v-for="el in deletedElements" :key="el.id">
-                        <button @click="restoreElement(el.id)">{{ el.label }}</button>
+                        <button @click="restoreElement(el.id)">{{ el.label[$i18n.locale] || el.label['fr'] || Object.values(el.label)[0] }}</button>
                     </li>
                 </ul>
                 <button @click="showDeletedModal = false">{{ $t('close') }}</button>
