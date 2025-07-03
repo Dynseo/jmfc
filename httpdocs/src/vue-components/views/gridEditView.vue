@@ -544,7 +544,7 @@
     export default vueConfig;
 </script>
 
-<style scoped>
+<style>
 .deleted-item {
     opacity: 0.5;
     filter: grayscale(1);
