@@ -229,7 +229,8 @@
             },
             clearElements() {
                 if (confirm(i18nService.t('CONFIRM_DELETE_ALL_ELEMS'))) {
-                    this.gridData.gridElements = [];
+                    // Soft delete de tous les éléments
+                    this.gridData.gridElements = this.gridData.gridElements.map(el => ({ ...el, deleted: true }));
                     gridInstance.updateGridWithUndo(this.gridData);
                 }
             },
