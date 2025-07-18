@@ -62,13 +62,14 @@ try {
 
     // check subscription
     $stmt = $pdo->prepare("
-        SELECT a.statut 
+        SELECT a.statut, a.date_debut, a.date_fin, a.subscription_type, a.montant, a.frequence_paiement
         FROM clients c 
         JOIN abonnements a ON c.id_client = a.id_client 
         WHERE c.key_name = :username 
             AND a.statut = 'actif' 
             AND a.date_debut <= NOW() 
             AND (a.date_fin IS NULL OR a.date_fin > NOW())
+        ORDER BY a.date_debut DESC
         LIMIT 1
     ");
 
@@ -87,6 +88,12 @@ try {
 
         echo json_encode([
             'active' => true,
+            'subscription_type' => $result['subscription_type'],
+            'date_debut' => $result['date_debut'],
+            'date_fin' => $result['date_fin'],
+            'montant' => $result['montant'],
+            'frequence_paiement' => $result['frequence_paiement'],
+            'is_trial' => floatval($result['montant']) === 0.0,
             'timestamp' => date('c')
         ]);
     } else {

@@ -2,6 +2,8 @@
 error_log("Origin: " . ($_SERVER['HTTP_ORIGIN'] ?? 'none'));
 error_log("Request Method: " . $_SERVER['REQUEST_METHOD']);
 
+header('Content-Type: application/json');
+
 $config = require_once '/var/www/jmfc/config/config.php';
 
 $allowedOrigins = $config['allowed_origins'] ?? [];
@@ -66,7 +68,12 @@ try {
                     statut,
                     montant,
                     frequence_paiement,
-                    renouvellement_auto
+                    renouvellement_auto,
+                    methode_paiement,
+                    subscription_type,
+                    platform,
+                    created_at,
+                    updated_at
                 ) VALUES (
                     :client_id,
                     :formule_id,
@@ -75,7 +82,12 @@ try {
                     'actif',
                     0,
                     'mensuel',
-                    false
+                    false,
+                    'trial',
+                    'trial',
+                    'web',
+                    NOW(),
+                    NOW()
                 )
             ");
     
@@ -88,13 +100,15 @@ try {
             $pdo->commit();
 
             $checkStmt = $pdo->prepare("
-                SELECT c.id_client, a.statut 
+                SELECT c.id_client, a.statut, a.subscription_type, a.date_debut, a.date_fin, a.montant
                 FROM clients c 
                 JOIN abonnements a ON c.id_client = a.id_client 
                 WHERE c.key_name = :username 
                     AND a.statut = 'actif' 
                     AND a.date_debut <= NOW() 
                     AND (a.date_fin IS NULL OR a.date_fin > NOW())
+                ORDER BY a.date_debut DESC
+                LIMIT 1
             ");
             
             $checkStmt->execute(['username' => $username]);
@@ -108,7 +122,11 @@ try {
                 'data' => [
                     'client_id' => $clientId,
                     'subscription_active' => !empty($checkResult),
-                    'trial_end' => date('Y-m-d', strtotime("+{$config['subscription']['trial_days']} days"))
+                    'subscription_type' => $checkResult ? $checkResult['subscription_type'] : null,
+                    'is_trial' => $checkResult ? floatval($checkResult['montant']) === 0.0 : false,
+                    'trial_end' => date('Y-m-d', strtotime("+{$config['subscription']['trial_days']} days")),
+                    'date_debut' => $checkResult ? $checkResult['date_debut'] : null,
+                    'date_fin' => $checkResult ? $checkResult['date_fin'] : null
                 ]
             ]);
     
