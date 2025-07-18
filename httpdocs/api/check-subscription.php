@@ -76,6 +76,8 @@ try {
     $stmt->execute(['username' => $username]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    error_log('Database result: ' . json_encode($result));
+
     if ($result) {
         //last connection
         $updateStmt = $pdo->prepare("
