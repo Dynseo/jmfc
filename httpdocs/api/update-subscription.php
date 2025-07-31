@@ -1,6 +1,8 @@
 <?php
-// API pour mettre à jour les abonnements après un paiement in-app
-error_log('Update Subscription API Called');
+// debug
+error_log('API Update subscription called - Request Details:');
+error_log('Headers: ' . json_encode(getallheaders()));
+error_log('GET params: ' . json_encode($_GET));
 
 header('Content-Type: application/json');
 
@@ -57,6 +59,7 @@ $required_fields = ['username', 'productId', 'subscriptionType', 'platform'];
 foreach ($required_fields as $field) {
     if (!isset($data[$field]) || empty($data[$field])) {
         http_response_code(400);
+        error_log("Missing required field: $field");
         echo json_encode([
             'error' => 'Missing required field',
             'message' => "Field '$field' is required"
@@ -106,7 +109,7 @@ try {
     // Désactiver les anciens abonnements
     $stmt = $pdo->prepare("
         UPDATE abonnements 
-        SET statut = 'inactif', 
+        SET statut = 'suspendu', 
             date_fin = NOW(),
             updated_at = NOW()
         WHERE id_client = :user_id 
