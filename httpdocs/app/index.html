@@ -1,12 +1,114 @@
 ﻿<!DOCTYPE html>
-<html>
+<html class="notranslate" translate="no">
 <head>
-    <title></title>
-    <meta charset='utf-8'>
+    <title>JeMeFaisComprendre</title>
+    <meta id="viewPortMeta" name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+    <link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials">
+
+    <link rel="stylesheet" href="css/fontawesome/css/all.css">
+
+    <link rel="stylesheet" href="css/jquery-ui.css">
+    <link rel="stylesheet" href="css/skeleton.css">
+    <link rel="stylesheet" href="css/bootstrap-grid.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barriecito&family=Raleway&display=swap" rel="stylesheet">
+
 </head>
-<body>
-<script>
-    window.location.replace("../");
+<body onload="window.loaded = true;">
+    <div id="app" class="holy-grail">
+        <div id="touchElement" class="grid-container" style="z-index: 2; display: none; -webkit-touch-callout: none; -webkit-user-select: none;">
+        </div>
+        <audio style="display: none" id="audioPlayer" src="" preload="none"></audio>
+        <video style="display: none" id="videoPlayer" src="" preload="none"></video>
+        <notification-bar ref="notificationBar" style="display:none;"></notification-bar>
+        <progress-bar-modal v-show="showModal === modalTypes.MODAL_PROGRESSBAR" ref="progressBar" @close="showModal = null"></progress-bar-modal>
+        <search-modal v-if="showModal === modalTypes.MODAL_SEARCH" @close="showModal = null;" :route-to-edit="Router.getCurrentView() === Router.VIEWS.GridEditView" :options="modalOptions"></search-modal>
+        <div class="grid-container grid-mask" v-if="false">
+            <i class="fas fa-4x fa-spinner fa-spin" style="top: 40%;"></i>
+            <div style="position: fixed; top: 50%; width: 100%; text-align: center; font-size: 2em;">
+                <span>loading...</span>
+            </div>
+        </div>
+        <div class="holy-grail-body" v-cloak>
+            <main role="main" class="holy-grail-content">
+                <!-- Main page content -->
+                <div class="srow content text-content" v-if="!component">
+                    <div class="grid-container grid-mask">
+                        <i class="fas fa-4x fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+                <component v-if="component" v-bind:is="component" v-bind="properties" :key="componentKey"></component>
+            </main>
+        </div>
+    </div>
+    <section id="bottom_bck">
+        <div class="kids_jmfc"></div> 
+        <div class="wave wave1"></div>
+        <div class="wave wave2"></div>
+        <div class="wave wave3"></div>
+        <div class="wave wave4"></div>
+    </section>
+<!-- browser compatibility checks and polyfills -->
+<script type="text/javascript" src='lib/modernizr-custom.js'></script>
+<script type="text/javascript">
+    if (typeof Modernizr === 'undefined') {
+        console.error('Modernizr is not loaded');
+    }
 </script>
+<script type="text/javascript">
+    // polyfill for String.replaceAll, https://stackoverflow.com/questions/1144783/how-do-i-replace-all-occurrences-of-a-string-in-javascript
+    if(!String.prototype.replaceAll){Object.defineProperty(String.prototype,'replaceAll',{configurable:!0,writable:!0,enumerable:!1,value:function(search,replace){return this.replace(Object.prototype.toString.call(search)==='[object RegExp]'?search.global?search:RegExp(search.source,/\/([a-z]*)$/.exec(search.toString())[1]+'g'):RegExp(String(search).replace(/[.^$*+?()[{|\\]/g,"\\$&"),"g"),replace)}})}
+
+    testEval("function x(a = 1){}", "default parameters")
+    if(![].fill) {
+        logAndRedirect("Browser doesn't support Array.fill");
+    }
+
+    checkModernizr('promises');
+    checkModernizr('indexeddb');
+
+    function checkModernizr(modernizrFeature) {
+        Modernizr.on(modernizrFeature, function (result) {
+            if (!result) {
+                logAndRedirect(modernizrFeature)
+            }
+        });
+    }
+
+    function logAndRedirect(missingFeature) {
+        console.warn("Browser doesn't support " + missingFeature + ".");
+        window.location.replace("unsupported.html");
+    }
+
+    function testEval(evalString, msg) {
+        try {
+            eval(evalString);
+        } catch (e) {
+            console.log(e);
+            logAndRedirect(msg);
+        }
+    }
+</script>
+
+<!-- libraries, not provided by npm -->
+<script src="lib/jquery.min.js"></script>
+<script src="lib/jquery-ui.min.js"></script>
+<script src="lib/jquery.ui.touchpunch.min.js"></script>
+<script type="text/javascript" src='lib/gridList.js'></script>
+<script type="text/javascript" src='lib/jquery.gridList.js'></script>
+<script type="text/javascript" src='lib/jquery.contextMenu.min.js'></script>
+<script type="text/javascript" src='lib/jquery.ui.position.min.js'></script>
+<script type="text/javascript" src='lib/object-model.min.js'></script>
+<script type="text/javascript" src='lib/pouchdb-8.0.1.min.js'></script>
+<script type="text/javascript" src='lib/loglevel.min.js'></script>
+<script type="text/javascript" src='lib/sjcl.min.js'></script>    
+<script type="module" src="build/jmfc-system.bundle.js"></script>
+
+<link rel="stylesheet" href="css/custom.css">
 </body>
-</html>
+</html> 

@@ -4,7 +4,11 @@
   "description": "Je Me Fais Comprendre app",
   "main": "index.js",
   "dependencies": {
+    "@capacitor/android": "^7.3.0",
+    "@capacitor/cli": "^7.3.0",
+    "@capacitor/core": "^7.3.0",
     "@klues/couch-auth": "^0.20.1",
+    "copy-webpack-plugin": "^13.0.0",
     "cors": "^2.8.5",
     "dotenv-flow": "^3.2.0",
     "express": "^4.19.2",

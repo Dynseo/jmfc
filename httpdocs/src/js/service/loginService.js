@@ -179,7 +179,7 @@ loginService.register = function (user, plainPassword, saveUser, email) {
     log.debug('Starting registration process for user:', user);
     
     // 1. Enregistrement SQL
-    return fetch('/api/register-user.php', {
+    return fetch('https://jmfc.dynseo.com/api/register-user.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -321,7 +321,7 @@ function loginInternal(user, hashedPassword, saveUser) {
             _loginInfo = info;
            
             try {
-                const url = `/api/check-subscription.php?username=${encodeURIComponent(info.user_id)}`;
+                const url = `https://jmfc.dynseo.com/api/check-subscription.php?username=${encodeURIComponent(info.user_id)}`;
                 const headers = {
                     'Authorization': `Bearer ${info.token}`,
                     'Content-Type': 'application/json'

@@ -1,5 +1,6 @@
 let path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = env => {
     let buildDir = 'app/build/';
@@ -21,7 +22,18 @@ module.exports = env => {
     return {
         mode: mode,
         entry: entryScript,
-        plugins: [new VueLoaderPlugin()],
+        plugins: [
+            new VueLoaderPlugin(),
+            new CopyWebpackPlugin({
+                patterns: [
+                    { from: 'app/lib', to: 'app/lib' },
+                    { from: 'app/css', to: 'app/css' },
+                    { from: 'app/img', to: 'app/img' },
+                    { from: 'live_metadata.json', to: 'live_metadata.json' },
+                    { from: 'grd_base', to: 'grd_base' }
+                ]
+            })
+        ],
         output: {
             path: path.resolve(__dirname, buildDir),
             publicPath: publicPath,

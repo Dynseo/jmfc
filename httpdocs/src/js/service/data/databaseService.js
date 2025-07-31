@@ -583,7 +583,7 @@ databaseService.deleteUserAccount = function(username) {
         // Helper function to delete user from MySQL
         function deleteFromMySQL(username, resolve, reject) {
             $.ajax({
-                url: '/api/delete-user.php',
+                url: 'https://jmfc.dynseo.com/api/delete-user.php',
                 type: 'DELETE',
                 data: JSON.stringify({ username }),
                 contentType: 'application/json',

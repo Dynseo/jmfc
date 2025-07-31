@@ -17,6 +17,7 @@ import { databaseService } from './service/data/databaseService';
 import { localStorageService } from './service/data/localStorageService';
 import { MainVue } from './vue/mainVue';
 import HelpView from '../vue-components/views/helpView.vue';
+import LogView from '../vue-components/views/logView.vue';
 import { constants } from './util/constants.js';
 import { urlParamService } from './service/urlParamService';
 import { guardNavigation } from './navigationGuard.js';
@@ -37,7 +38,8 @@ let _locked = false;
 Router.VIEWS = {
     AllGridsView: AllGridsView,
     GridView: GridView,
-    GridEditView: GridEditView
+    GridEditView: GridEditView,
+    LogView: LogView
 }
 
 Router.init = function (injectIdParam, initialHash) {
@@ -120,6 +122,9 @@ Router.init = function (injectIdParam, initialHash) {
         },
         help: function () {
             loadVueView(HelpView);
+        },
+        logs: () => {
+            loadVueView(LogView);
         },
         '*': function () {
             helpService.setHelpLocation('main', '');
@@ -224,6 +229,10 @@ Router.toLogin = function () {
 
 Router.toSettings = function () {
     Router.to('#settings');
+};
+
+Router.toLogs = function () {
+    Router.to('#logs');
 };
 
 Router.toLastOpenedGrid = function () {
@@ -356,8 +365,70 @@ function toMainInternal() {
         if (gridId) {
             return Router.toGrid(gridId);
         }
-        loadVueView(GridView); // !!!
+        
+        // Pour les nouveaux utilisateurs, vérifier s'il y a des grilles disponibles
+        dataService.getGrids().then((grids) => {
+            if (grids && grids.length > 0) {
+                // Utiliser la première grille disponible comme grille par défaut
+                const defaultGrid = grids[0];
+                log.info('Using default grid for new user:', defaultGrid.id);
+                
+                // Sauvegarder cette grille comme grille d'accueil pour les prochaines fois
+                dataService.updateMetadata({ homeGridId: defaultGrid.id });
+                
+                return Router.toGrid(defaultGrid.id);
+            } else {
+                // Aucune grille disponible, charger la grille par défaut depuis live_metadata.json
+                log.info('No grids available, loading default grid from live_metadata.json');
+                loadDefaultGridForNewUser();
+            }
+        }).catch((error) => {
+            log.error('Error loading grids for new user:', error);
+            loadDefaultGridForNewUser();
+        });
     });
+}
+
+async function loadDefaultGridForNewUser() {
+    try {
+        // Charger la grille par défaut directement depuis l'URL
+        const defaultGridUrl = 'build/grd_base/default.grd.json';
+        log.info('Loading default grid from URL:', defaultGridUrl);
+        
+        // Charger directement le fichier JSON
+        const response = await fetch(defaultGridUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const gridData = await response.json();
+        log.info('Default grid file loaded successfully');
+        
+        // Importer les données directement
+        await dataService.importBackupData(gridData, { 
+            skipDelete: true, 
+            filename: 'default.grd.json' 
+        });
+        
+        // Après import, récupérer les grilles et rediriger vers la première
+        const grids = await dataService.getGrids();
+        if (grids && grids.length > 0) {
+            const defaultGrid = grids[0];
+            log.info('Default grid loaded successfully, redirecting to:', defaultGrid.id);
+            
+            // Sauvegarder cette grille comme grille d'accueil
+            await dataService.updateMetadata({ homeGridId: defaultGrid.id });
+            
+            Router.toGrid(defaultGrid.id);
+        } else {
+            log.warn('Failed to load default grid, showing grid management view');
+            loadVueView(GridView);
+        }
+    } catch (error) {
+        log.error('Error loading default grid for new user:', error);
+        // En cas d'erreur, montrer la vue de gestion des grilles
+        loadVueView(GridView);
+    }
 }
 
 $(document).on(constants.EVENT_UI_LOCKED, () => {

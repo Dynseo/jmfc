@@ -105,3 +105,34 @@ nav li:focus {
         line-height: 0;
     }
 }
+
+@media (max-width: 600px) {
+  header button,
+  header .small,
+  header .spaced,
+  header a,
+  header input {
+    font-size: 7vw !important;
+    height: 52px !important;
+    max-height: 60px !important;
+    min-width: 48px !important;
+    padding: 0 12px !important;
+  }
+  header button i.fas,
+  header button i.far,
+  header button i.fab,
+  header .small i.fas,
+  header .spaced i.fas {
+    font-size: 8vw !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    vertical-align: middle !important;
+    line-height: 1 !important;
+    display: inline-block !important;
+  }
+  header .hide-mobile {
+    font-size: 6vw !important;
+  }
+}

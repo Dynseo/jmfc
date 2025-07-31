@@ -13,9 +13,10 @@
                 <h2 class="six columns">{{ $t('generalSettings') }}</h2>
                 <div v-if="saveSuccess" style="padding-top: 1.7em;"><i class="fas fa-check" style="color: green"></i> <span>{{ $t('allChangesSaved') }}</span></div>
             </div>
+            
             <div class="srow">
                 <div class="eleven columns">
-                    <h3 class="mt-2">{{ $t('applicationLanguage') }}</h3>
+                    <h3>{{ $t('applicationLanguage') }}</h3>
                     <div class="srow">
                         <label class="three columns" for="inLanguage">{{ $t('selectLanguage') }}</label>
                         <select class="five columns" id="inLanguage" v-model="appSettings.appLang" @change="saveAppLang()">
@@ -141,6 +142,11 @@
                     </div>
                 </div>
             </div>
+            <div class="srow">
+                <div class="eleven columns">
+                    <button @click="navigateToLogs">Voir les logs</button>
+                </div>
+            </div>
         </div>
          <div class="bottom-spacer"></div>
     </div>
@@ -162,6 +168,7 @@
     import {speechServiceExternal} from "../../js/service/speechServiceExternal.js";
     import { gridUtil } from '../../js/util/gridUtil.js';
     import {helpService} from "../../js/service/helpService";
+    import {Router} from "../../js/router.js";
 
     
     let KEY_SETTINGS_SHOW_ALL_VOICES = "KEY_SETTINGS_SHOW_ALL_VOICES";
@@ -316,6 +323,9 @@
                 speechServiceExternal.cacheAll(allGrids, externalVoice, (progress) => {
                     this.externalVoiceCacheProgress = progress;
                 });
+            },
+            navigateToLogs() {
+                Router.toLogs();
             }
         },
         async mounted() {

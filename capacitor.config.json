@@ -1,0 +1,24 @@
+{
+  "appId": "com.jemefaiscomprendre.app",
+  "appName": "JeMeFaisComprendre",
+  "webDir": "httpdocs/app",
+  "cordova": {
+    "preferences": {
+      "ScrollEnabled": "false",
+      "BackupWebStorage": "none"
+    }
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    },
+    "CordovaPurchase": {
+      "enabled": true
+    }
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  }
+}

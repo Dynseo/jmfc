@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@capacitor/android": "^7.4.0",
+    "@capacitor/cli": "^7.4.0",
+    "@capacitor/core": "^7.4.0",
+    "@revenuecat/purchases-capacitor": "^11.1.0",
+    "@revenuecat/purchases-capacitor-ui": "^11.1.0",
+    "cordova-plugin-purchase": "^13.12.1"
+  }
+}

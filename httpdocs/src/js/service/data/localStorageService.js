@@ -336,6 +336,21 @@ localStorageService.setCurrentAppVersion = function (versionString) {
     localStorageService.save(CURRENT_VERSION_KEY, versionString);
 };
 
+/**
+ * Sauvegarde le statut d'abonnement
+ */
+localStorageService.setSubscriptionStatus = function (isActive) {
+    localStorageService.save('SUBSCRIPTION_STATUS', isActive ? 'active' : 'inactive');
+};
+
+/**
+ * Récupère le statut d'abonnement
+ */
+localStorageService.getSubscriptionStatus = function () {
+    const status = localStorageService.get('SUBSCRIPTION_STATUS');
+    return status === 'active';
+};
+
 function getSyncedDbsList() {
     let syncedDbsString = localStorageService.get(SYNCED_DBS_LIST_KEY);
     if (!syncedDbsString) {

@@ -3,6 +3,7 @@ import { localStorageService } from './service/data/localStorageService.js';
 import { Router } from './router.js';
 import { VuePluginManager } from './vue/vuePluginManager';
 import { MainVue } from './vue/mainVue';
+import { LOG_LEVEL, Purchases } from "@revenuecat/purchases-capacitor";
 
 import './../css/gridlist.css';
 import './../css/jquery.contextMenu.css';
@@ -16,8 +17,16 @@ import { i18nService } from './service/i18nService';
 import { printService } from './service/printService';
 import { notificationService } from './service/notificationService.js';
 import { dataService } from './service/data/dataService';
+import { checkSubscription, presentPaywall } from './service/paymentService';
 
 let SERVICE_WORKER_UPDATE_CHECK_INTERVAL = 1000 * 60 * 15; // 15 Minutes
+
+async function configureRevenueCat() {
+    await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG }); // Activer les logs de débogage
+    if (Capacitor.getPlatform() === 'android') {
+        await Purchases.configure({ apiKey: "goog_thFeQYZRaOMayQvehWkCByJyaXJ" });
+    }
+}
 
 async function init() {
     let promises = [];
@@ -75,6 +84,18 @@ async function init() {
                 Router.init('#injectView', initHash);
             }
         });
+    await configureRevenueCat();
+
+    const userToCheck = localStorageService.getAutologinUser();
+    if (userToCheck) {
+        const hasActiveSubscription = await checkSubscription(userToCheck);
+        if (!hasActiveSubscription) {
+            const success = await presentPaywall();
+            if (!success) {
+                console.warn('L\'utilisateur a annulé le paywall ou une erreur s\'est produite.');
+            }
+        }
+    }
 }
 init();
 

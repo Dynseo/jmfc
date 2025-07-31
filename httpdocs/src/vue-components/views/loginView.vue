@@ -142,6 +142,7 @@
     import {Router} from "../../js/router";
     import HeaderIcon from '../../vue-components/components/headerIcon.vue'
     import {modelUtil} from "../../js/util/modelUtil";
+    import { handlePaywallIfNeeded } from '../../js/service/paymentService';
 
     export default {
         components: {HeaderIcon},
@@ -178,12 +179,20 @@
                 thiz.loginTryUser = user;
                 thiz.loginSuccess = undefined;
                 thiz.loginErrorCode = '';
-                loginService.loginPlainPassword(user, password, this.remember).then(() => {
+                loginService.loginPlainPassword(user, password, this.remember).then(async () => {
                     thiz.loginSuccess = true;
+                    // Vérifier l'abonnement après connexion réussie
+                    await handlePaywallIfNeeded();
                     Router.toMain();
-                }).catch((reason) => {
-                    thiz.loginSuccess = false;
-                    thiz.loginErrorCode = reason;
+                }).catch(async (reason) => {
+                    if (reason === loginService.ERROR_CODE_INACTIVE_ACCOUNT) {
+                        // Afficher le paywall au lieu du message d'erreur
+                        thiz.loginSuccess = null; // Reset pour éviter l'affichage du message d'erreur
+                        await handlePaywallIfNeeded();
+                    } else {
+                        thiz.loginSuccess = false;
+                        thiz.loginErrorCode = reason;
+                    }
                 });
             },
             loginStored(user) {
@@ -194,11 +203,19 @@
                 thiz.loginSuccess = undefined;
                 thiz.loginTryUser = user;
                 thiz.loginErrorCode = '';
-                loginService.loginStoredUser(user).then(() => {
+                loginService.loginStoredUser(user).then(async () => {
                     thiz.loginSuccess = true;
-                }).catch(reason => {
-                    thiz.loginSuccess = false;
-                    thiz.loginErrorCode = reason;
+                    // Vérifier l'abonnement après connexion réussie
+                    await handlePaywallIfNeeded();
+                }).catch(async (reason) => {
+                    if (reason === loginService.ERROR_CODE_INACTIVE_ACCOUNT) {
+                        // Afficher le paywall au lieu du message d'erreur
+                        thiz.loginSuccess = null; // Reset pour éviter l'affichage du message d'erreur
+                        await handlePaywallIfNeeded();
+                    } else {
+                        thiz.loginSuccess = false;
+                        thiz.loginErrorCode = reason;
+                    }
                 });
             },
             removeStoredUser(user) {
