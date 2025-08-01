@@ -144,14 +144,41 @@ try {
     // Déterminer la formule (ID dans la table formules)
     $formule = $config['subscription']['default_formule'] ?? 1;
 
+    // Déterminer le montant et la fréquence de paiement
+    $montant = 0;
+    $frequencePaiement = 'mensuel';
+
+    switch ($subscriptionType) {
+        case 'monthly':
+            $montant = $config['subscription']['monthly_price'] ?? 9.99;
+            $frequencePaiement = 'mensuel';
+            break;
+        case 'yearly':
+            $montant = $config['subscription']['yearly_price'] ?? 99.99;
+            $frequencePaiement = 'annuel';
+            break;
+        case 'lifetime':
+            $montant = $config['subscription']['lifetime_price'] ?? 299.99;
+            $frequencePaiement = 'annuel'; // ou une valeur appropriée pour lifetime
+            break;
+    }
+
     // Créer le nouvel abonnement
     $stmt = $pdo->prepare("
         INSERT INTO abonnements (
             id_client, 
             id_formule, 
-            statut, 
             date_debut, 
             date_fin, 
+            statut,
+            montant,
+            frequence_paiement,
+            date_creation,
+            date_derniere_modification,
+            methode_paiement,
+            renouvellement_auto,
+            date_dernier_paiement,
+            date_prochain_paiement,
             transaction_id,
             purchase_token,
             purchase_time,
@@ -163,9 +190,17 @@ try {
         ) VALUES (
             :user_id, 
             :formule, 
-            'actif', 
             :date_debut, 
             :date_fin, 
+            'actif',
+            :montant,
+            :frequence_paiement,
+            NOW(),
+            NOW(),
+            :platform,
+            1,
+            NOW(),
+            :date_prochain_paiement,
             :transaction_id,
             :purchase_token,
             :purchase_time,
@@ -182,11 +217,14 @@ try {
         'formule' => $formule,
         'date_debut' => $dateDebut->format('Y-m-d H:i:s'),
         'date_fin' => $dateFin ? $dateFin->format('Y-m-d H:i:s') : null,
+        'montant' => $montant,
+        'frequence_paiement' => $frequencePaiement,
+        'platform' => $platform,
+        'date_prochain_paiement' => $dateFin ? $dateFin->format('Y-m-d H:i:s') : null,
         'transaction_id' => $transactionId,
         'purchase_token' => $purchaseToken,
-        'purchase_time' => date('Y-m-d H:i:s', $purchaseTime / 1000),
+        'purchase_time' => $purchaseTime ? date('Y-m-d H:i:s', $purchaseTime / 1000) : null,
         'product_id' => $productId,
-        'platform' => $platform,
         'subscription_type' => $subscriptionType
     ]);
 
