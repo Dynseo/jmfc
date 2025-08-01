@@ -4,6 +4,8 @@ import Navigo from 'navigo';
 import { i18nService } from './service/i18nService';
 import { dataService } from './service/data/dataService.js';
 import { helpService } from './service/helpService';
+import { handlePaywallIfNeeded, checkSubscription, initializeRevenueCatForUser, presentPaywall } from './service/paymentService.js';
+import { loginService } from './service/loginService.js';
 
 import AllGridsView from '../vue-components/views/allGridsView.vue';
 import GridEditView from '../vue-components/views/gridEditView.vue';
@@ -13,6 +15,7 @@ import RegisterView from '../vue-components/views/registerView.vue';
 import WelcomeView from '../vue-components/views/welcomeView.vue';
 import AboutView from '../vue-components/views/aboutView.vue';
 import SettingsView from '../vue-components/views/settingsView.vue';
+import SubscriptionRequiredView from '../vue-components/views/subscriptionRequiredView.vue';
 import { databaseService } from './service/data/databaseService';
 import { localStorageService } from './service/data/localStorageService';
 import { MainVue } from './vue/mainVue';
@@ -22,7 +25,7 @@ import { constants } from './util/constants.js';
 import { urlParamService } from './service/urlParamService';
 import { guardNavigation } from './navigationGuard.js';
 
-let NO_DB_VIEWS = ['#login', '#register', '#welcome', '#add', '#about', '#help', '#outdated'];
+let NO_DB_VIEWS = ['#login', '#register', '#welcome', '#add', '#about', '#help', '#outdated', '#subscription'];
 
 let Router = {};
 let navigoInstance = null;
@@ -107,6 +110,10 @@ Router.init = function (injectIdParam, initialHash) {
             helpService.setHelpLocation('', '#main');
             //helpService.setHelpLocation('06_users', '#online-users');
             loadVueView(RegisterView);
+        },
+        subscription: function () {
+            helpService.setHelpLocation('', '#main');
+            loadVueView(SubscriptionRequiredView);
         },
         welcome: function () {
             helpService.setHelpLocationIndex();
@@ -213,6 +220,10 @@ Router.toMain = function () {
 
 Router.toRegister = function () {
     Router.to('#register');
+};
+
+Router.toSubscription = function () {
+    Router.to('#subscription');
 };
 
 /*Router.toAddOffline = function () {
@@ -360,32 +371,127 @@ function toMainInternal() {
     if (!routingEndabled) {
         return;
     }
-    dataService.getMetadata().then((metadata) => {
-        let gridId = metadata ? metadata.homeGridId || metadata.lastOpenedGridId : null;
-        if (gridId) {
-            return Router.toGrid(gridId);
+    
+    // Vérifier d'abord si l'utilisateur a un abonnement actif
+    checkSubscriptionAndBlockIfNeeded().then(hasActiveSubscription => {
+        if (!hasActiveSubscription) {
+            // Bloquer l'accès à l'application et forcer le paywall
+            return;
         }
         
-        // Pour les nouveaux utilisateurs, vérifier s'il y a des grilles disponibles
-        dataService.getGrids().then((grids) => {
-            if (grids && grids.length > 0) {
-                // Utiliser la première grille disponible comme grille par défaut
-                const defaultGrid = grids[0];
-                log.info('Using default grid for new user:', defaultGrid.id);
-                
-                // Sauvegarder cette grille comme grille d'accueil pour les prochaines fois
-                dataService.updateMetadata({ homeGridId: defaultGrid.id });
-                
-                return Router.toGrid(defaultGrid.id);
-            } else {
-                // Aucune grille disponible, charger la grille par défaut depuis live_metadata.json
-                log.info('No grids available, loading default grid from live_metadata.json');
-                loadDefaultGridForNewUser();
+        // Si abonnement actif, continuer normalement
+        dataService.getMetadata().then((metadata) => {
+            let gridId = metadata ? metadata.homeGridId || metadata.lastOpenedGridId : null;
+            if (gridId) {
+                return Router.toGrid(gridId);
             }
-        }).catch((error) => {
-            log.error('Error loading grids for new user:', error);
-            loadDefaultGridForNewUser();
+            
+            // Pour les nouveaux utilisateurs, vérifier s'il y a des grilles disponibles
+            dataService.getGrids().then((grids) => {
+                if (grids && grids.length > 0) {
+                    // Utiliser la première grille disponible comme grille par défaut
+                    const defaultGrid = grids[0];
+                    log.info('Using default grid for new user:', defaultGrid.id);
+                    
+                    // Sauvegarder cette grille comme grille d'accueil pour les prochaines fois
+                    dataService.updateMetadata({ homeGridId: defaultGrid.id });
+                    
+                    return Router.toGrid(defaultGrid.id);
+                } else {
+                    // Aucune grille disponible, charger la grille par défaut depuis live_metadata.json
+                    log.info('No grids available, loading default grid from live_metadata.json');
+                    loadDefaultGridForNewUser();
+                }
+            }).catch((error) => {
+                log.error('Error loading grids for new user:', error);
+                loadDefaultGridForNewUser();
+            });
         });
+    }).catch(error => {
+        log.error('Error checking subscription:', error);
+        // En cas d'erreur, rediriger vers login
+        Router.toLogin();
+    });
+}
+
+async function checkSubscriptionAndBlockIfNeeded() {
+    const currentUser = localStorageService.getLastActiveUser();
+    if (!currentUser) {
+        log.info('No user logged in, redirecting to login');
+        Router.toLogin();
+        return false;
+    }
+    
+    try {
+        const hasActiveSubscription = await checkSubscription(currentUser);
+        if (!hasActiveSubscription) {
+            log.info('No active subscription, redirecting to subscription page');
+            Router.toSubscription();
+            return false;
+        }
+        
+        log.info('Active subscription found, allowing access');
+        return true;
+    } catch (error) {
+        log.error('Error checking subscription:', error);
+        // En cas d'erreur, rediriger vers la page d'abonnement par sécurité
+        Router.toSubscription();
+        return false;
+    }
+}
+
+function showBlockingPaywall() {
+    // Créer une vue de paywall bloquante
+    const paywallOverlay = document.createElement('div');
+    paywallOverlay.id = 'blocking-paywall-overlay';
+    paywallOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-family: Arial, sans-serif;
+    `;
+    
+    paywallOverlay.innerHTML = `
+        <div style="text-align: center; padding: 20px; background: #333; border-radius: 10px; max-width: 400px;">
+            <h2>Abonnement requis</h2>
+            <p>Vous devez avoir un abonnement actif pour accéder à l'application.</p>
+            <button id="show-paywall-btn" style="padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Voir les offres
+            </button>
+            <button id="logout-btn" style="padding: 10px 20px; margin: 10px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Se déconnecter
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(paywallOverlay);
+    
+    // Gérer les clics
+    document.getElementById('show-paywall-btn').addEventListener('click', async () => {
+        try {
+            const success = await presentPaywall();
+            if (success) {
+                // L'utilisateur a souscrit, recharger la page
+                document.body.removeChild(paywallOverlay);
+                location.reload();
+            }
+        } catch (error) {
+            log.error('Error showing paywall:', error);
+        }
+    });
+    
+    document.getElementById('logout-btn').addEventListener('click', () => {
+        loginService.logout();
+        document.body.removeChild(paywallOverlay);
+        Router.toLogin();
     });
 }
 

@@ -5,8 +5,28 @@ import { Capacitor } from '@capacitor/core';
 import { logService } from './logService.js';
 import { localStorageService } from './data/localStorageService.js';
 import { loginService } from './loginService.js';
+import { log } from '../util/log.js';
+
+// Fonction pour identifier l'utilisateur dans RevenueCat
+export async function initializeRevenueCatForUser() {
+    console.log('Initialisation de RevenueCat pour l\'utilisateur connecté');
+    const currentUser = localStorageService.getLastActiveUser();
+    console.log('Utilisateur actuel:', currentUser);
+    if (currentUser) {
+        try {
+            console.log(`Identification de l'utilisateur ${currentUser} dans RevenueCat`);
+            // Identifier l'utilisateur dans RevenueCat avec votre propre ID
+            await Purchases.logIn({appUserID: currentUser});
+            console.log(`Utilisateur ${currentUser} identifié dans RevenueCat`);
+        } catch (error) {
+            console.error('Erreur lors de l\'identification dans RevenueCat:', error);
+        }
+    }
+}
 
 export async function presentPaywall() {
+    // logService.storeToLog('Tentative d\'affichage du paywall');
+    console.log('Tentative d\'affichage du paywall');
     try {
         // Present paywall for current offering:
         const { result } = await RevenueCatUI.presentPaywall();
@@ -19,9 +39,11 @@ export async function presentPaywall() {
                 return false;
             case PAYWALL_RESULT.PURCHASED:
             case PAYWALL_RESULT.RESTORED:
+                // logService.storeToLog('Abonnement acheté ou restauré via le paywall');
+                console.log('Abonnement acheté ou restauré via le paywall');
                 // Après un achat réussi, mettre à jour la base de données
                 try {
-                    logService.storeToLog('Abonnement acheté ou restauré, mise à jour de la base de données');
+                    // logService.storeToLog('Abonnement acheté ou restauré, mise à jour de la base de données');
                     const customerInfo = await Purchases.getCustomerInfo();
                     const latestTransaction = getLatestTransaction(customerInfo);
                     
@@ -141,7 +163,10 @@ function getSubscriptionType(productId) {
 }
 
 export async function handlePaywallIfNeeded() {
+    console.log('Vérification de l\'abonnement actif pour l\'utilisateur connecté');
+    // logService.storeToLog('Vérification de l\'abonnement actif pour l\'utilisateur connecté');
     const currentUser = localStorageService.getLastActiveUser();
+    console.log('Utilisateur actuel:', currentUser);
     if (!currentUser) {
         return; // Pas d'utilisateur connecté
     }
@@ -157,8 +182,10 @@ export async function handlePaywallIfNeeded() {
 }
 
 function getLatestTransaction(customerInfo) {
+    console.log('Récupération de la dernière transaction pour l\'utilisateur :', JSON.stringify(customerInfo));
     // Récupérer la dernière transaction depuis les informations client RevenueCat
-    const entitlements = customerInfo.entitlements.active;
+    const entitlements = customerInfo.customerInfo.entitlements.active;
+    console.log('Entitlements actifs:', entitlements);
     
     for (const [key, entitlement] of Object.entries(entitlements)) {
         if (entitlement.isActive) {

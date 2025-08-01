@@ -86,16 +86,8 @@ async function init() {
         });
     await configureRevenueCat();
 
-    const userToCheck = localStorageService.getAutologinUser();
-    if (userToCheck) {
-        const hasActiveSubscription = await checkSubscription(userToCheck);
-        if (!hasActiveSubscription) {
-            const success = await presentPaywall();
-            if (!success) {
-                console.warn('L\'utilisateur a annulé le paywall ou une erreur s\'est produite.');
-            }
-        }
-    }
+    // Suppression de l'ancien système de paywall automatique
+    // Le contrôle se fait maintenant dans le routeur
 }
 init();
 

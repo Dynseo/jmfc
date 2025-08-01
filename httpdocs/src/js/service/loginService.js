@@ -8,6 +8,7 @@ import { Router } from '../router';
 import { webradioService } from './webradioService.js';
 import { MainVue } from '../vue/mainVue.js';
 import {util} from "../util/util.js";
+import { initializeRevenueCatForUser } from './paymentService.js';
 
 let loginService = {};
 let _loginInfo = null;
@@ -344,19 +345,31 @@ function loginInternal(user, hashedPassword, saveUser) {
 
                 const data = await response.json();
                 
-                if (!data.active) {
-                    log.info('No active subscription found, rejecting login');
-                    _loginInfo = null;
-                    return Promise.reject(loginService.ERROR_CODE_INACTIVE_ACCOUNT);
-                }
-
-                log.info('Active subscription found, proceeding with login');
+                // Permettre la connexion même sans abonnement actif
+                log.info('Proceeding with login');
                 _loggedInUser = user;
                 localStorageService.setLastActiveUser(user);
                 localStorageService.setAutologinUser(saveUser ? user : '');
                 if (saveUser) {
                     localStorageService.saveUserPassword(user, hashedPassword);
                 }
+                
+                // Si pas d'abonnement actif, on laisse la connexion se faire mais on affichera le paywall plus tard
+                if (!data.active) {
+                    log.info('No active subscription found, but allowing login. Paywall will be shown.');
+                }
+                
+                // Identifier l'utilisateur dans RevenueCat après connexion réussie (avec délai)
+                setTimeout(async () => {
+                    try {
+                        log.info('Initializing RevenueCat for user:', user);
+                        await initializeRevenueCatForUser();
+                    } catch (error) {
+                        log.warn('Erreur lors de l\'identification RevenueCat:', error);
+                        // Ne pas faire échouer la connexion pour autant
+                    }
+                }, 1000); // Attendre 1 seconde pour s'assurer que tout est bien initialisé
+                
                 return Promise.resolve();
             } catch (error) {
                 log.error('Error checking subscription:', error);

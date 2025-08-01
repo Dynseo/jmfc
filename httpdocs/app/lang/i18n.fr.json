@@ -928,5 +928,9 @@
     "emailSupport": "Support par email",
     "helpCenter": "Centre d'aide",
     "subscription": "Abonnement",
-    "manageSubscription": "Gérer l'abonnement"
+    "manageSubscription": "Gérer l'abonnement",
+    "subscriptionRequired": "Abonnement requis",
+    "subscriptionRequiredMessage": "Vous devez avoir un abonnement actif pour accéder à cette application. Choisissez une formule pour continuer.",
+    "viewSubscriptionPlans": "Voir les formules",
+    "processing": "Traitement en cours..."
 }
