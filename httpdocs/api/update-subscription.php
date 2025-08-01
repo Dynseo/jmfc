@@ -72,9 +72,22 @@ $username = $data['username'];
 $productId = $data['productId'];
 $transactionId = $data['transactionId'] ?? null;
 $purchaseToken = $data['purchaseToken'] ?? null;
-$purchaseTime = $data['purchaseTime'] ?? time() * 1000; // Convertir en millisecondes
+$purchaseTime = $data['purchaseTime'] ?? time() * 1000;
 $subscriptionType = $data['subscriptionType'];
 $platform = $data['platform'];
+
+// Si c'est RevenueCat, vérifier le statut de l'abonnement via l'API RevenueCat
+if ($platform === 'revenuecat') {
+    $revenueCatStatus = checkRevenueCatSubscription($username, $config);
+    if (!$revenueCatStatus || !$revenueCatStatus['active']) {
+        http_response_code(400);
+        echo json_encode([
+            'error' => 'Invalid subscription',
+            'message' => 'No active subscription found in RevenueCat'
+        ]);
+        exit;
+    }
+}
 
 error_log("Processing subscription update for user: $username, product: $productId, type: $subscriptionType");
 
@@ -269,5 +282,43 @@ try {
         'error' => 'Server error',
         'message' => 'Internal server error'
     ]);
+}
+
+function checkRevenueCatSubscription($appUserId, $config) {
+    $revenueCatApiKey = $config['revenuecat']['api_key'] ?? '';
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, "https://api.revenuecat.com/v1/subscribers/$appUserId");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Authorization: Bearer $revenueCatApiKey",
+        "Content-Type: application/json"
+    ]);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode !== 200) {
+        return null;
+    }
+    
+    $data = json_decode($response, true);
+    
+    // Vérifier si l'utilisateur a un abonnement actif
+    $subscriber = $data['subscriber'] ?? [];
+    $entitlements = $subscriber['entitlements'] ?? [];
+    
+    foreach ($entitlements as $entitlement) {
+        if ($entitlement['expires_date'] === null || strtotime($entitlement['expires_date']) > time()) {
+            return [
+                'active' => true,
+                'product_id' => $entitlement['product_identifier'],
+                'expires_date' => $entitlement['expires_date']
+            ];
+        }
+    }
+    
+    return ['active' => false];
 }
 ?>
