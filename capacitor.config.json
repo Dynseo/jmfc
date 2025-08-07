@@ -20,5 +20,11 @@
     "allowMixedContent": true,
     "captureInput": true,
     "webContentsDebuggingEnabled": false
+  },
+  "ios": {
+    "webContentsDebuggingEnabled": false,
+    "scrollEnabled": true,
+    "allowsBackForwardNavigationGestures": false,
+    "limitsNavigationsToAppBoundDomains": false
   }
 }

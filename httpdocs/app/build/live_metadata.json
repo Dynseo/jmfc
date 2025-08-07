@@ -1,0 +1,24 @@
+[
+     {
+      "name": "Grilles de démarrage",
+      "author": "",
+      "website": "",
+      "description": {
+        "fr": "Jeu de grilles de démarrage en français"
+      },
+      "wordPrediction": false,
+      "tags": [
+        "défaut"
+      ],
+      "selfContained": true,
+      "images": [
+
+      ],
+      "priority": 100,
+      "thumbnail": "pictograms/conversation_1712951.svg",
+      "url": "grd_base/default.grd.json",
+      "languages": [
+        "fr"
+      ]
+    }
+  ]

@@ -171,15 +171,17 @@
                 // prevent zoom
                 $('#viewPortMeta').attr('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
                 $('#gridView').on('touchmove', this.preventZoomHandler);
+                console.log('Grid locked - zoom disabled');
             },
             setViewPropsUnlocked() {
                 $(document).trigger(constants.EVENT_SIDEBAR_OPEN);
                 $(document).trigger(constants.EVENT_UI_UNLOCKED);
 
-                //enable zoom
-                $('#viewPortMeta').attr('content', 'width=device-width, initial-scale=1');
+                //enable zoom - allow scaling on iOS
+                $('#viewPortMeta').attr('content', 'width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes');
                 $('body').attr('touch-action', '');
                 $('#gridView').off('touchmove', this.preventZoomHandler);
+                console.log('Grid unlocked - zoom enabled');
             },
             preventZoomHandler(event) {
                 event.preventDefault();
