@@ -192,7 +192,9 @@ function getLatestTransaction(customerInfo) {
             return {
                 productId: entitlement.productIdentifier,
                 transactionId: entitlement.originalPurchaseDate, // ou autre identifiant unique
-                purchaseToken: entitlement.store === 'PLAY_STORE' ? entitlement.originalPurchaseDate : null,
+                purchaseToken: entitlement.store === 'PLAY_STORE' ? entitlement.originalPurchaseDate : 
+                              entitlement.store === 'APP_STORE' ? entitlement.originalPurchaseDate : 
+                              entitlement.originalPurchaseDate, // Fallback pour d'autres stores
                 purchaseTime: new Date(entitlement.latestPurchaseDate).getTime()
             };
         }

@@ -29,6 +29,8 @@ module.exports = env => {
                     { from: 'app/lib', to: 'app/lib' },
                     { from: 'app/css', to: 'app/css' },
                     { from: 'app/img', to: 'app/img' },
+                    // Ensure pictograms are available from the app root on mobile (Capacitor webDir)
+                    { from: 'pictograms', to: path.resolve(__dirname, 'app/pictograms') },
                     { from: 'live_metadata.json', to: 'live_metadata.json' },
                     { from: 'grd_base', to: 'grd_base' }
                 ]
