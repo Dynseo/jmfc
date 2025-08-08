@@ -25,6 +25,8 @@ Les abonnements sont gérés via App Store Connect, avec les identifiants suivan
 
 Le développeur Fabrice Coffy doit transférer la propriété de l'application au compte du client. Pour cela, il faut récupérer l'Apple ID et le Team ID du client, sûrement en créant un compte développeur Apple si le client n'en a pas déjà un.
 
+Une fois que le client aura tous les accès, il faut suivre la documentation de RevenueCat pour ajouter la plateforme App Store (https://www.revenuecat.com/docs/projects/connect-a-store).
+
 ### RevenueCat
 L'application utilise RevenueCat pour gérer les abonnements. Les identifiants RevenueCat sont :
 - thomas.marques@dynseo.com
@@ -40,9 +42,15 @@ Pour que le client puisse bien gérer ses abonnements, il faudra lui transférer
 - Inviter le client avec son adresse email (il faudra qu'il se crée un compte RevenueCat s'il n'en a pas déjà un)
 - Sous "Actions", choisir "Transfer ownership"
 
-## Passage de l'application en production
+### Configurer les produits
+Une fois que la plateforme App Store est ajoutée sur RevenueCat, il faut lui ajouter les produits.
 
-VOIR AVEC ALKAYA
+Pour ça, il faut aller sur l'onglet Products >> Products, cliquer sur "New" et remplir les infos pour importer les produits depuis Apple.
+
+Ensuite, il faut ajouter les produits nouvellement créés à l'offering "default" sous Products >> Offerings.
+
+### Server Notifications
+Pour pouvoir recevoir des notifications de RevenueCat, il faut configurer un nouveau webhook dans les "Integrations". ça doit être le même que celui qui existe déjà, à la différence qu'il doit concerner Apple.
 
 ## Synchronisation du projet Android
 Pour synchroniser le projet Android avec le code source sous jmfc, il faut suivre ces étapes :
@@ -91,8 +99,16 @@ Pour synchroniser le projet iOS avec le code source sous jmfc, il faut suivre ce
    npm run start-auth-ssl
 ```
 
+Il faudra faire en sorte que ce script s'exécute en continue sur le serveur, en tâche de fond.
+
 
 ## Documentations importantes
+- [Play Console Google](https://play.google.com/console/u/2/developers/7905041377930319579/app/4972187449897569532/tracks/4701659536371198696/releases/2/details)
+- [App Store Connect](https://appstoreconnect.apple.com/)
+- [Apple Developer Account](https://developer.apple.com/account)
 - [Documentation Capacitor](https://capacitorjs.com/docs)
 - [Documentation RevenueCat](https://docs.revenuecat.com/docs)
 - [Dashboard RevenueCat](https://app.revenuecat.com)
+- [Ajouter un store](https://www.revenuecat.com/docs/projects/connect-a-store)
+- [Configurer les produits](https://www.revenuecat.com/docs/offerings/products-overview)
+- [Offerings](https://www.revenuecat.com/docs/offerings/overview)
