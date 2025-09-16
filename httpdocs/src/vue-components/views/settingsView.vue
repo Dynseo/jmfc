@@ -142,11 +142,11 @@
                     </div>
                 </div>
             </div>
-            <div class="srow">
+            <!-- <div class="srow">
                 <div class="eleven columns">
                     <button @click="navigateToLogs">Voir les logs</button>
                 </div>
-            </div>
+            </div> -->
         </div>
          <div class="bottom-spacer"></div>
     </div>

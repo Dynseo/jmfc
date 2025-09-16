@@ -20,7 +20,7 @@ import { databaseService } from './service/data/databaseService';
 import { localStorageService } from './service/data/localStorageService';
 import { MainVue } from './vue/mainVue';
 import HelpView from '../vue-components/views/helpView.vue';
-import LogView from '../vue-components/views/logView.vue';
+// import LogView from '../vue-components/views/logView.vue';
 import { constants } from './util/constants.js';
 import { urlParamService } from './service/urlParamService';
 import { guardNavigation } from './navigationGuard.js';
@@ -42,7 +42,7 @@ Router.VIEWS = {
     AllGridsView: AllGridsView,
     GridView: GridView,
     GridEditView: GridEditView,
-    LogView: LogView
+    // LogView: LogView
 }
 
 Router.init = function (injectIdParam, initialHash) {
@@ -130,9 +130,9 @@ Router.init = function (injectIdParam, initialHash) {
         help: function () {
             loadVueView(HelpView);
         },
-        logs: () => {
-            loadVueView(LogView);
-        },
+        // logs: () => {
+        //     loadVueView(LogView);
+        // },
         '*': function () {
             helpService.setHelpLocation('main', '');
             //**helpService.setHelpLocation('02_navigation', '#main-view');

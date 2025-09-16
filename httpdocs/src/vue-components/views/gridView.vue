@@ -168,10 +168,12 @@
                 $(document).trigger(constants.EVENT_SIDEBAR_CLOSE);
                 $(document).trigger(constants.EVENT_UI_LOCKED);
 
-                // prevent zoom
-                $('#viewPortMeta').attr('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
-                $('#gridView').on('touchmove', this.preventZoomHandler);
-                console.log('Grid locked - zoom disabled');
+                // Do NOT prevent zoom on iOS to avoid being stuck zoomed-in
+                // Allow user to pinch-zoom out if needed
+                $('#viewPortMeta').attr('content', 'width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes');
+                // Keep interactions smooth but do not block pinch-zoom
+                $('#gridView').off('touchmove', this.preventZoomHandler);
+                console.log('Grid locked - zoom allowed (iOS-safe)');
             },
             setViewPropsUnlocked() {
                 $(document).trigger(constants.EVENT_SIDEBAR_OPEN);
@@ -184,7 +186,12 @@
                 console.log('Grid unlocked - zoom enabled');
             },
             preventZoomHandler(event) {
-                event.preventDefault();
+                // Only prevent default for single-touch move to keep scrolling/drag logic,
+                // but allow multi-touch (pinch) to enable zooming on iOS.
+                const touches = (event.originalEvent && event.originalEvent.touches) || event.touches;
+                if (!touches || touches.length <= 1) {
+                    event.preventDefault();
+                }
             },
             initInputMethods(continueRunningMethods) {
                 let thiz = this;
