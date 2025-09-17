@@ -76,6 +76,8 @@ $purchaseTime = $data['purchaseTime'] ?? time() * 1000;
 $subscriptionType = $data['subscriptionType'];
 $platform = $data['platform'];
 
+error_log("Received subscription update request: " . json_encode($data));
+
 // Si c'est RevenueCat, vérifier le statut de l'abonnement via l'API RevenueCat
 if ($platform === 'revenuecat') {
     $revenueCatStatus = checkRevenueCatSubscription($username, $config);
