@@ -79,8 +79,8 @@ $platform = $data['platform'];
 error_log("Received subscription update request: " . json_encode($data));
 
 // Si c'est RevenueCat, vérifier le statut de l'abonnement via l'API RevenueCat
-if ($platform === 'revenuecat') {
-    $revenueCatStatus = checkRevenueCatSubscription($username, $config);
+if ($platform === 'revenuecat' || $platform === 'ios' || $platform === 'android') {
+    $revenueCatStatus = checkRevenueCatSubscription($username, $platform, $config);
     if (!$revenueCatStatus || !$revenueCatStatus['active']) {
         http_response_code(400);
         echo json_encode([
@@ -286,8 +286,14 @@ try {
     ]);
 }
 
-function checkRevenueCatSubscription($appUserId, $config) {
-    $revenueCatApiKey = $config['revenuecat']['api_key'] ?? '';
+function checkRevenueCatSubscription($appUserId, $platform, $config) {
+    if ($platform === 'android') {
+        $revenueCatApiKey = $config['google']['api_key'] ?? '';
+    } elseif ($platform === 'ios') {
+        $revenueCatApiKey = $config['apple']['api_key'] ?? '';
+    } else {
+        $revenueCatApiKey = $config['revenuecat']['api_key'] ?? '';
+    }
     
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, "https://api.revenuecat.com/v1/subscribers/$appUserId");
