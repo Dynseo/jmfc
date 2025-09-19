@@ -190,6 +190,10 @@
             
         },
         mounted() {
+            // Autorise la rotation sur cette page
+            if (window.cordova && window.cordova.plugins && window.cordova.plugins.screenorientation) {
+                window.cordova.plugins.screenorientation.unlock();
+            }
         }
     }
 </script>

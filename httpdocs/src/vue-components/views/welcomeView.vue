@@ -204,10 +204,14 @@
             }
         },
         mounted() {
+            // Autorise la rotation sur cette page
+            if (window.cordova && window.cordova.plugins && window.cordova.plugins.screenorientation) {
+                window.cordova.plugins.screenorientation.unlock();
+            }
             // Vérifie si l'utilisateur a demandé à ne jamais revoir le popup
             const neverShowPopup = localStorage.getItem('neverShowPopup');
             if (neverShowPopup !== 'true') {
-                this.$nextTick(() => { // On utilise nextTick pour s'assurer que le DOM est complètement chargé
+                this.$nextTick(() => {
                     this.showPopup = true;
                 });
             }

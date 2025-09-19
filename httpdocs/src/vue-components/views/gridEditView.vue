@@ -314,6 +314,10 @@
             $(document).on(constants.EVENT_DB_PULL_UPDATED, this.reloadFn);
         },
         mounted: function () {
+            // Verrouille l'orientation paysage sur cette page
+            if (window.cordova && window.cordova.plugins && window.cordova.plugins.screenorientation) {
+                window.cordova.plugins.screenorientation.lock('landscape');
+            }
             pouchDbService.pauseSync();
             let thiz = this;
             vueApp = thiz;

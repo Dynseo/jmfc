@@ -329,6 +329,10 @@
             }
         },
         async mounted() {
+            // Verrouille l'orientation paysage sur cette page
+            if (window.cordova && window.cordova.plugins && window.cordova.plugins.screenorientation) {
+                window.cordova.plugins.screenorientation.lock('landscape');
+            }
             let thiz = this;
             dataService.getMetadata().then(metadata => {
                 thiz.metadata = JSON.parse(JSON.stringify(metadata));

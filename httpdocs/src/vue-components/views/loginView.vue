@@ -271,6 +271,10 @@
             }
         },
         mounted() {
+            // Autorise la rotation sur cette page
+            if (window.cordova && window.cordova.plugins && window.cordova.plugins.screenorientation) {
+                window.cordova.plugins.screenorientation.unlock();
+            }
             let currentlyLoggedInUser = loginService.getLoggedInUsername();
             this.activeUser = localStorageService.getAutologinUser() || currentlyLoggedInUser;
             this.savedUsers = localStorageService.getSavedUsers(this.activeUser);
