@@ -27,9 +27,9 @@ async function configureRevenueCat() {
         await Purchases.configure({ apiKey: "goog_thFeQYZRaOMayQvehWkCByJyaXJ" });
     }
     //! CONFIGURATION IOS
-    // if (Capacitor.getPlatform() === 'ios') {
-    //     await Purchases.configure({ apiKey: "ios_9b1d3f2c4e0a4c5b8f6d7e8f9a0b1c2d" });
-    // }
+    if (Capacitor.getPlatform() === 'ios') {
+        await Purchases.configure({ apiKey: "appl_gprigLvFttfYXKXTYROnmHjezfy" });
+    }
 }
 
 async function init() {
