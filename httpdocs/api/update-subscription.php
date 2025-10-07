@@ -163,6 +163,8 @@ try {
     $montant = 0;
     $frequencePaiement = 'mensuel';
 
+    error_log("Subscription type: $subscriptionType");
+
     switch ($subscriptionType) {
         case 'monthly':
             $montant = $config['subscription']['monthly_price'] ?? 9.99;
@@ -177,6 +179,9 @@ try {
             $frequencePaiement = 'annuel'; // ou une valeur appropriée pour lifetime
             break;
     }
+
+    error_log("Subscription amount: $montant, frequency: $frequencePaiement");
+    error_log(print_r($config['subscription'], true));
 
     // Créer le nouvel abonnement
     $stmt = $pdo->prepare("
