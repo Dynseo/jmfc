@@ -71,6 +71,8 @@ try {
     // Traiter selon le type d'événement RevenueCat
     switch ($eventType) {
         case 'INITIAL_PURCHASE':
+            error_log("RevenueCat initial purchase received for user $appUserId – no subscription update performed");
+            break;
         case 'RENEWAL':
         case 'PRODUCT_CHANGE':
             // Activer/renouveler l'abonnement
