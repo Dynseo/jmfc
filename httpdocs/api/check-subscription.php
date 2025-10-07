@@ -1,8 +1,8 @@
 <?php
 // debug
-error_log('API Called - Request Details:');
-error_log('Headers: ' . json_encode(getallheaders()));
-error_log('GET params: ' . json_encode($_GET));
+// error_log('API Called - Request Details:');
+// error_log('Headers: ' . json_encode(getallheaders()));
+// error_log('GET params: ' . json_encode($_GET));
 
 header('Content-Type: application/json');
 
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $headers = getallheaders();
 $auth_header = isset($headers['Authorization']) ? $headers['Authorization'] : '';
 
-error_log('Auth header: ' . $auth_header);
+// error_log('Auth header: ' . $auth_header);
 
 if (!$auth_header || !preg_match('/Bearer\s+(.*)$/i', $auth_header, $matches)) {
     error_log('Auth failed: No valid Authorization header');
