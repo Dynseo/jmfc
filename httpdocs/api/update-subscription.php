@@ -3,6 +3,7 @@
 error_log('API Update subscription called - Request Details:');
 error_log('Headers: ' . json_encode(getallheaders()));
 error_log('GET params: ' . json_encode($_GET));
+error_log("Request Method: " . $_SERVER['REQUEST_METHOD']);
 
 header('Content-Type: application/json');
 
