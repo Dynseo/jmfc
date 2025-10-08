@@ -156,8 +156,8 @@ export async function updateSubscriptionInDatabase(purchaseInfo) {
 
 function getSubscriptionType(productId) {
     // Mappez les IDs de produits RevenueCat vers les types d'abonnement
-    if (productId.includes('monthly')) return 'monthly';
-    if (productId.includes('yearly') || productId.includes('annual')) return 'yearly';
+    if (productId.includes('monthly') || productId.includes('1m')) return 'monthly';
+    if (productId.includes('yearly') || productId.includes('annual') || productId.includes('1y')) return 'yearly';
     if (productId.includes('lifetime')) return 'lifetime';
     return 'monthly'; // Par défaut
 }
