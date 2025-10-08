@@ -292,6 +292,7 @@ try {
 }
 
 function checkRevenueCatSubscription($appUserId, $platform, $config) {
+    error_log("Checking RevenueCat subscription for user: $appUserId on platform: $platform");
     if ($platform === 'android') {
         $revenueCatApiKey = $config['google']['api_key'] ?? '';
     } elseif ($platform === 'ios') {
