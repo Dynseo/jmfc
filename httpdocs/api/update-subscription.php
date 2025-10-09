@@ -33,6 +33,7 @@ $auth_header = isset($headers['Authorization']) ? $headers['Authorization'] : ''
 
 if (!$auth_header || !preg_match('/Bearer\s+(.*)$/i', $auth_header, $matches)) {
     http_response_code(401);
+    error_log("Unauthorized access attempt - Missing or invalid Authorization header");
     echo json_encode([
         'error' => 'Unauthorized',
         'message' => 'No valid authorization header found'
