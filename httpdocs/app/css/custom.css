@@ -89,13 +89,7 @@ button .fa, button .fas, .button  .fa, .button  .fas {
 .grid-item-content:focus {
     outline: 3px solid #819fad;
 }
-button.blue, .button.blue {
-  /*  background: var(--col-blue);
-    color: white; */
-}
-*:focus {
-  /*  outline: 3px solid var(--col-bck); */
-}
+/* removed empty rule blocks to satisfy linter */
 
 .btn-accordion {
   color: var(--col-blue);
@@ -172,7 +166,7 @@ nav ul {
 }
 
 nav li:hover button, nav li button:focus {
-    background-color: #DBF4FF; !important;
+    background-color: #DBF4FF !important;
 }
 
 nav li a:focus, nav li a:hover {
@@ -181,7 +175,7 @@ nav li a:focus, nav li a:hover {
 }
 
 nav button.selected {
-    background-color: #DBF4FF; !important;
+    background-color: #DBF4FF !important;
     border: 3px solid var(--col-bck);
     text-decoration: underline;
     outline: none;
@@ -414,9 +408,7 @@ nav #helpButton:focus {
 .alignCenter {
     text-align: center;
 }
-.container {
-   /* margin: auto !important;     */
-}
+/* .container custom margin was commented; rule removed to satisfy linter */
 .floatNone {
     float:none;
 }
@@ -541,7 +533,14 @@ h2.alignCenter {
         display: none !important;
     }
     * {
-        -webkit-print-color-adjust: exact !important; /*Chrome, Safari */
-        color-adjust: exact !important;  /*Firefox*/
+        print-color-adjust: exact !important; /* Standard */
+        -webkit-print-color-adjust: exact !important; /* Chrome, Safari */
     }
+}
+
+/* Prevent iOS auto-zoom on form controls by ensuring minimum 16px font size */
+input,
+textarea,
+select {
+  font-size: 16px !important;
 }
