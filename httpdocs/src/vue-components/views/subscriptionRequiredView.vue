@@ -72,6 +72,14 @@ export default {
         }
     },
     mounted() {
+        // Autoriser la rotation sur cette page (comme register/login)
+        if (window.cordova && window.cordova.plugins && window.cordova.plugins.screenorientation) {
+            try {
+                window.cordova.plugins.screenorientation.unlock();
+            } catch (e) {
+                // Ignore si non supporté
+            }
+        }
         // Initialiser RevenueCat à l'affichage de la vue
         initializeRevenueCatForUser().catch(error => {
             console.warn('Failed to initialize RevenueCat:', error);
