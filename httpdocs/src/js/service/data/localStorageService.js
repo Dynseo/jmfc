@@ -13,6 +13,7 @@ let USED_LOCALES_KEY = 'AG_USED_LOCALES_KEY';
 let CURRENT_VERSION_KEY = 'AG_CURRENT_VERSION_KEY';
 let APP_SETTINGS = 'AG_APP_SETTINGS';
 let USER_SETTINGS = 'AG_USER_SETTINGS';
+let RECENT_IMAGE_LIMIT = 20;
 
 let localStorageService = {};
 let storage = window.localStorage;
@@ -349,6 +350,53 @@ localStorageService.setSubscriptionStatus = function (isActive) {
 localStorageService.getSubscriptionStatus = function () {
     const status = localStorageService.get('SUBSCRIPTION_STATUS');
     return status === 'active';
+};
+
+localStorageService.getRecentImages = function (username) {
+    let settings = localStorageService.getUserSettings(username);
+    return Array.isArray(settings.recentImages) ? settings.recentImages.slice() : [];
+};
+
+localStorageService.addRecentImage = function (imageData, username) {
+    if (!imageData || typeof imageData !== 'string') {
+        return localStorageService.getRecentImages(username);
+    }
+    username = username || localStorageService.getAutologinUser() || localStorageService.getLastActiveUser();
+    if (!username) {
+        return [];
+    }
+    let settings = localStorageService.getUserSettings(username);
+    let recentImages = Array.isArray(settings.recentImages) ? settings.recentImages.slice() : [];
+    recentImages = recentImages.filter((image) => image && image.data && image.data !== imageData);
+    let mimeType = null;
+    if (imageData.startsWith('data:') && imageData.indexOf(';') > -1) {
+        mimeType = imageData.substring(5, imageData.indexOf(';'));
+    }
+    recentImages.unshift({
+        data: imageData,
+        addedAt: new Date().getTime(),
+        mimeType: mimeType
+    });
+    if (recentImages.length > RECENT_IMAGE_LIMIT) {
+        recentImages = recentImages.slice(0, RECENT_IMAGE_LIMIT);
+    }
+    localStorageService.saveUserSettings({ username: username, recentImages: recentImages }, username);
+    return recentImages;
+};
+
+localStorageService.removeRecentImage = function (imageData, username) {
+    if (!imageData) {
+        return localStorageService.getRecentImages(username);
+    }
+    username = username || localStorageService.getAutologinUser() || localStorageService.getLastActiveUser();
+    if (!username) {
+        return [];
+    }
+    let settings = localStorageService.getUserSettings(username);
+    let recentImages = Array.isArray(settings.recentImages) ? settings.recentImages.slice() : [];
+    recentImages = recentImages.filter((image) => image && image.data !== imageData);
+    localStorageService.saveUserSettings({ username: username, recentImages: recentImages }, username);
+    return recentImages;
 };
 
 function getSyncedDbsList() {

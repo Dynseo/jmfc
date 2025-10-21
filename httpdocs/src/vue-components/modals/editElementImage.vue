@@ -12,6 +12,21 @@
             </button>
             <button class="three columns" v-show="hasImage" @click="clearImage"><i class="fas fa-times"/> <span>{{ $t('clearImage') }}</span></button>
         </div>
+        <div class="srow" v-if="recentImages.length">
+            <label class="two columns">{{ $t('recentImages') }}</label>
+            <div class="ten columns recent-images">
+                <button
+                    v-for="(recent, index) in recentImages"
+                    :key="recent.addedAt + '-' + index"
+                    type="button"
+                    class="recent-image"
+                    :title="$t('useRecentImage')"
+                    :aria-label="$t('useRecentImage')"
+                    @click="useRecentImage(recent)">
+                    <img :src="recent.data" :alt="$t('useRecentImage')" />
+                </button>
+            </div>
+        </div>
         <div class="srow">
             <div class="img-preview offset-by-two four columns">
                 <span class="show-mobile" v-show="!hasImage"><i class="fas fa-image"/> <span>{{ $t('noImageChosen') }}</span></span>
@@ -52,6 +67,7 @@
                 constants: constants,
                 i18nService: i18nService,
                 localStorageService: localStorageService,
+                recentImages: []
             }
         },
         methods: {
@@ -83,28 +99,49 @@
                     });
                 }
             },
+            loadRecentImages() {
+                this.recentImages = localStorageService.getRecentImages();
+            },
+            setImageData(imageData) {
+                if (!imageData) {
+                    return;
+                }
+                this.gridElement.image.data = imageData;
+                this.gridElement.image.url = null;
+                this.gridElement.image.author = null;
+                this.gridElement.image.authorURL = null;
+                this.gridElement.image.searchProviderName = null;
+                this.gridElement.image.searchProviderOptions = [];
+                this.recentImages = localStorageService.addRecentImage(imageData);
+            },
             setBase64(base64) {
                 if (!base64) {
                     return;
                 }
-                let thiz = this;
                 if (base64.length > 50 * 1024) {
-                    imageUtil.convertBase64(base64, 2 * thiz.elementW).then(newData => {
-                        if (newData.length < base64.length) {
+                    imageUtil.convertBase64(base64, 2 * this.elementW).then(newData => {
+                        if (newData && newData.length < base64.length) {
                             log.info(`converted image from ${Math.round(base64.length / 1024)}kB to ${Math.round(newData.length / 1024)}kB`);
-                            thiz.gridElement.image.data = newData;
+                            this.setImageData(newData);
                         } else {
-                            log.info(`converting resulted in bigger image (${Math.round(newData.length / 1024)}kB), using old image with ${Math.round(base64.length / 1024)}kB`);
-                            thiz.gridElement.image.data = base64;
+                            let size = newData ? Math.round(newData.length / 1024) : Math.round(base64.length / 1024);
+                            log.info(`converting resulted in bigger image (${size}kB), using original image with ${Math.round(base64.length / 1024)}kB`);
+                            this.setImageData(base64);
                         }
                     })
                 } else {
                     log.debug(`image size is ${Math.round(base64.length / 1024)}kB`);
-                    thiz.gridElement.image.data = base64;
+                    this.setImageData(base64);
                 }
             },
             clearImage() {
                 this.gridElement.image = JSON.parse(JSON.stringify(new GridImage()));
+            },
+            useRecentImage(recentImage) {
+                if (!recentImage || !recentImage.data) {
+                    return;
+                }
+                this.setImageData(recentImage.data);
             },
             preventDefault(event) {
                 event.preventDefault();
@@ -123,6 +160,7 @@
             if (this.imageSearch) {
                 this.search(this.imageSearch);
             }
+            this.loadRecentImages();
         },
         beforeDestroy() {
             helpService.revertToLastLocation();
@@ -159,6 +197,35 @@
         line-height: 1em;
         height: 1.5em;
         width: 3.5em;
+    }
+
+    .recent-images {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5em;
+        align-items: center;
+    }
+
+    .recent-image {
+        border: none;
+        background: transparent;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    .recent-image img {
+        width: 75px;
+        height: 75px;
+        object-fit: contain;
+        border: 1px solid lightgray;
+        border-radius: 4px;
+        background: #fff;
+        padding: 0.25em;
+    }
+
+    .recent-image:focus-visible {
+        outline: 3px solid #0078d4;
+        border-radius: 6px;
     }
 
     @media (max-width: 850px) {

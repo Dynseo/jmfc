@@ -44,6 +44,7 @@ class SettingsUserLocal {
         this.isEmpty = settings.isEmpty !== undefined ? settings.isEmpty : true;
         this.systemVolume = settings.systemVolume !== undefined ? settings.systemVolume : 100;
         this.systemVolumeMuted = settings.systemVolumeMuted || false;
+        this.recentImages = Array.isArray(settings.recentImages) ? settings.recentImages : [];
 
         convertServiceLocal.updateDataModel(this);
     }
