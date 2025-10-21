@@ -52,6 +52,21 @@ loginService.getLoggedInUserDatabase = function () {
     return _loginInfo.userDBs[keys[0]];
 };
 
+loginService.getAuthToken = function () {
+    if (_loginInfo && _loginInfo.token) {
+        return _loginInfo.token;
+    }
+    try {
+        const session = JSON.parse(localStorage.getItem('superlogin.session'));
+        if (session && session.token) {
+            return session.token;
+        }
+    } catch (e) {
+        log.debug('Unable to read superlogin token from storage', e);
+    }
+    return null;
+};
+
 /**
  * logs in into remote couchdb (superlogin) and initializes local user database
  * @param plainPassword plain user password as typed in in password field
@@ -364,6 +379,14 @@ function loginInternal(user, hashedPassword, saveUser) {
                     try {
                         log.info('Initializing RevenueCat for user:', user);
                         await initializeRevenueCatForUser();
+                        // Une fois identifié dans RevenueCat, tenter une réconciliation
+                        const { reconcileSubscriptionWithRevenueCatIfMissing } = await import('./paymentService.js');
+                        const res = await reconcileSubscriptionWithRevenueCatIfMissing();
+                        if (res.fixed) {
+                            log.info('Subscription reconciled from RevenueCat entitlements');
+                        } else if (res.reason) {
+                            log.debug('No reconciliation needed:', res.reason);
+                        }
                     } catch (error) {
                         log.warn('Erreur lors de l\'identification RevenueCat:', error);
                         // Ne pas faire échouer la connexion pour autant

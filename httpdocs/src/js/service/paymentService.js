@@ -65,13 +65,13 @@ export async function presentPaywall() {
 }
 
 function getAuthToken() {
-    // Récupérer le token depuis superlogin, similaire à loginService.js
-    const loginInfo = loginService.getLoggedInUserDatabase();
-    if (loginInfo && loginInfo.token) {
-        return loginInfo.token;
+    // Récupérer le token depuis le loginService
+    const token = loginService.getAuthToken();
+    if (token) {
+        return token;
     }
-    
-    // Fallback: essayer de récupérer depuis localStorage
+
+    // Fallback: essayer de récupérer depuis localStorage si nécessaire
     try {
         const superloginData = JSON.parse(localStorage.getItem('superlogin.session'));
         if (superloginData && superloginData.token) {
@@ -201,4 +201,36 @@ function getLatestTransaction(customerInfo) {
     }
     
     return null;
+}
+
+// Vérifie RevenueCat et répare côté serveur si l'utilisateur a un droit actif mais
+// qu'aucune entrée n'existe en base (SQL) ou côté couch. Utilisable après login.
+export async function reconcileSubscriptionWithRevenueCatIfMissing() {
+    const currentUser = localStorageService.getLastActiveUser();
+    if (!currentUser) return { fixed: false, reason: 'no-user' };
+
+    try {
+        // 1) Interroger RevenueCat
+        const customerInfo = await Purchases.getCustomerInfo();
+        const latest = getLatestTransaction(customerInfo);
+
+        if (!latest) {
+            // Aucun droit actif dans RevenueCat => rien à faire
+            return { fixed: false, reason: 'no-entitlement' };
+        }
+
+        // 2) Vérifier l’état côté backend
+        const hasActiveInDb = await checkSubscription(currentUser);
+        if (hasActiveInDb) {
+            // DB déjà OK, on peut s’arrêter
+            return { fixed: false, reason: 'already-active' };
+        }
+
+        // 3) Si pas d’abonnement actif en DB mais présent dans RC, pousser une mise à jour
+        await updateSubscriptionInDatabase(latest);
+        return { fixed: true };
+    } catch (e) {
+        console.warn('Reconcile with RevenueCat failed:', e);
+        return { fixed: false, error: String(e) };
+    }
 }
