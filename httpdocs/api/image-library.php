@@ -7,6 +7,9 @@ $configPath = '/var/www/jmfc/config/config.php';
 $config = file_exists($configPath) ? require $configPath : null;
 $allowedOrigins = $config['allowed_origins'] ?? [];
 
+jmfc_send_cors_headers($allowedOrigins);
+$libraryBaseUrl = jmfc_compute_library_base_url($allowedOrigins);
+
 // Handle CORS preflight if needed (kept consistent with other API endpoints)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -38,16 +41,16 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
-        handleGet($indexFile);
+        handleGet($indexFile, $libraryBaseUrl);
         break;
     case 'POST':
         $session = jmfc_require_session(true);
-        handlePost($indexFile, $libraryDir, $session);
+        handlePost($indexFile, $libraryDir, $session, $libraryBaseUrl);
         break;
     case 'PUT':
     case 'PATCH':
         $session = jmfc_require_session(true);
-        handlePut($indexFile, $libraryDir, $session);
+        handlePut($indexFile, $libraryDir, $session, $libraryBaseUrl);
         break;
     case 'DELETE':
         $session = jmfc_require_session(true);
@@ -62,15 +65,16 @@ switch ($method) {
         break;
 }
 
-function handleGet(string $indexFile): void
+function handleGet(string $indexFile, string $baseUrl): void
 {
     $images = loadImages($indexFile);
+    $images = jmfc_prepare_images_for_response($images, $baseUrl);
     echo json_encode([
         'images' => $images
     ]);
 }
 
-function handlePost(string $indexFile, string $libraryDir, array $session): void
+function handlePost(string $indexFile, string $libraryDir, array $session, string $baseUrl): void
 {
     $payload = readJsonPayload();
 
@@ -148,11 +152,11 @@ function handlePost(string $indexFile, string $libraryDir, array $session): void
 
     http_response_code(201);
     echo json_encode([
-        'image' => $newImage
+        'image' => jmfc_prepare_image_for_response($newImage, $baseUrl)
     ]);
 }
 
-function handlePut(string $indexFile, string $libraryDir, array $session): void
+function handlePut(string $indexFile, string $libraryDir, array $session, string $baseUrl): void
 {
     $payload = readJsonPayload();
 
@@ -259,7 +263,7 @@ function handlePut(string $indexFile, string $libraryDir, array $session): void
     }
 
     echo json_encode([
-        'image' => $image
+        'image' => jmfc_prepare_image_for_response($image, $baseUrl)
     ]);
 }
 
@@ -320,6 +324,76 @@ function handleDelete(string $indexFile, string $libraryDir, array $session): vo
     echo json_encode([
         'deleted' => true
     ]);
+}
+
+function jmfc_send_cors_headers(array $allowedOrigins): void
+{
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    $allowAny = in_array('*', $allowedOrigins, true);
+
+    if ($allowAny) {
+        header('Access-Control-Allow-Origin: *');
+    } elseif ($origin && in_array($origin, $allowedOrigins, true)) {
+        header('Access-Control-Allow-Origin: ' . $origin);
+        header('Vary: Origin');
+    }
+
+    header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, Accept');
+    header('Access-Control-Expose-Headers: Content-Type');
+    header('Access-Control-Max-Age: 86400');
+}
+
+function jmfc_compute_library_base_url(array $allowedOrigins): string
+{
+    foreach ($allowedOrigins as $origin) {
+        if ($origin === '*' || !$origin) {
+            continue;
+        }
+        if (filter_var($origin, FILTER_VALIDATE_URL)) {
+            return rtrim($origin, '/');
+        }
+    }
+
+    $scheme = 'http';
+    if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+        $forwarded = explode(',', $_SERVER['HTTP_X_FORWARDED_PROTO']);
+        $scheme = trim($forwarded[0]);
+    } elseif (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+        $scheme = 'https';
+    }
+
+    $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
+
+    return $scheme . '://' . $host;
+}
+
+function jmfc_prepare_image_for_response(array $image, string $baseUrl): array
+{
+    $relative = $image['url'] ?? '';
+    if (!$relative) {
+        $image['publicUrl'] = null;
+        return $image;
+    }
+
+    if (preg_match('/^https?:\/\//i', $relative)) {
+        $image['publicUrl'] = $relative;
+        return $image;
+    }
+
+    $image['publicUrl'] = rtrim($baseUrl, '/') . '/' . ltrim($relative, '/');
+    return $image;
+}
+
+function jmfc_prepare_images_for_response(array $images, string $baseUrl): array
+{
+    $prepared = [];
+    foreach ($images as $image) {
+        if (is_array($image)) {
+            $prepared[] = jmfc_prepare_image_for_response($image, $baseUrl);
+        }
+    }
+    return $prepared;
 }
 
 function loadImages(string $indexFile): array
