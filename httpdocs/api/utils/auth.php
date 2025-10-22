@@ -40,44 +40,84 @@ if (!function_exists('jmfc_fetch_superlogin_session')) {
         if (!$superloginUrl) {
             $superloginUrl = 'https://jmfc.dynseo.com:3001';
         }
-        $endpoint = rtrim($superloginUrl, '/') . '/auth/user';
 
-        $ch = curl_init($endpoint);
-        $headers = [
-            'Authorization: Bearer ' . $token,
-            'Accept: application/json'
-        ];
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_TIMEOUT => 10,
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2,
-        ]);
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($ch);
-        curl_close($ch);
-
-        if ($response === false) {
-            error_log('Superlogin session fetch failed: ' . $curlError);
-            return null;
+        $verifySslEnv = getenv('JMFC_SUPERLOGIN_VERIFY_SSL');
+        $verifySsl = true;
+        if ($verifySslEnv !== false && $verifySslEnv !== '') {
+            $value = trim((string)$verifySslEnv);
+            if ($value === '0' || strcasecmp($value, 'false') === 0 || strcasecmp($value, 'off') === 0 || strcasecmp($value, 'no') === 0) {
+                $verifySsl = false;
+            }
         }
 
-        if ($httpCode !== 200) {
-            error_log('Superlogin responded with HTTP ' . $httpCode . ' when validating token');
-            return null;
+        $caInfo = getenv('JMFC_SUPERLOGIN_CAINFO');
+    $paths = ['/auth/session', '/auth/user'];
+        $lastError = null;
+        $sawNotFound = false;
+
+        $isExpectedStatus = static function ($status) {
+            return in_array((int)$status, [401, 403, 404], true);
+        };
+
+        foreach ($paths as $path) {
+            $endpoint = rtrim($superloginUrl, '/') . $path;
+
+            $ch = curl_init($endpoint);
+            $headers = [
+                'Authorization: Bearer ' . $token,
+                'Accept: application/json'
+            ];
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTPHEADER => $headers,
+                CURLOPT_TIMEOUT => 10,
+                CURLOPT_SSL_VERIFYPEER => $verifySsl,
+                CURLOPT_SSL_VERIFYHOST => $verifySsl ? 2 : 0,
+            ]);
+
+            if ($caInfo) {
+                curl_setopt($ch, CURLOPT_CAINFO, $caInfo);
+            }
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($response === false) {
+                $lastError = 'cURL error contacting ' . $endpoint . ': ' . $curlError;
+                continue;
+            }
+
+            if ($httpCode === 404) {
+                $sawNotFound = true;
+                continue;
+            }
+
+            if ($httpCode !== 200) {
+                if (!$isExpectedStatus($httpCode)) {
+                    error_log('Superlogin responded with HTTP ' . $httpCode . ' when validating token via ' . $endpoint);
+                }
+                return null;
+            }
+
+            $session = json_decode($response, true);
+            if (!is_array($session)) {
+                $lastError = 'Unable to decode JSON from ' . $endpoint;
+                continue;
+            }
+
+            return $session;
         }
 
-        $session = json_decode($response, true);
-        if (!is_array($session)) {
-            error_log('Unable to decode Superlogin session response');
-            return null;
+        if ($lastError) {
+            error_log('Superlogin session fetch failed: ' . $lastError);
+        } elseif ($sawNotFound) {
+            // Both endpoints missing is most likely an outdated token or legacy Superlogin.
+            error_log('Superlogin session validation endpoints responded with 404. Treating token as invalid.');
         }
-
-        return $session;
+        return null;
     }
 }
 
