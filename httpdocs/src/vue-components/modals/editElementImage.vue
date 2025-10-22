@@ -27,6 +27,28 @@
                 </button>
             </div>
         </div>
+        <div class="srow" v-if="isLibraryLoading">
+            <label class="two columns">{{ $t('imageLibrary') }}</label>
+            <div class="ten columns">
+                <span>{{ $t('imageLibraryLoading') }}</span>
+            </div>
+        </div>
+        <div class="srow" v-else-if="libraryImages.length">
+            <label class="two columns">{{ $t('imageLibrary') }}</label>
+            <div class="ten columns recent-images">
+                <button
+                    v-for="image in libraryImages"
+                    :key="image.id"
+                    type="button"
+                    class="recent-image"
+                    :title="image.name || $t('useLibraryImage')"
+                    :aria-label="image.name || $t('useLibraryImage')"
+                    @click="useLibraryImage(image)"
+                >
+                    <img :src="image.previewUrl" :alt="image.name || $t('useLibraryImage')" />
+                </button>
+            </div>
+        </div>
         <div class="srow">
             <div class="img-preview offset-by-two four columns">
                 <span class="show-mobile" v-show="!hasImage"><i class="fas fa-image"/> <span>{{ $t('noImageChosen') }}</span></span>
@@ -67,7 +89,9 @@
                 constants: constants,
                 i18nService: i18nService,
                 localStorageService: localStorageService,
-                recentImages: []
+                recentImages: [],
+                libraryImages: [],
+                isLibraryLoading: false
             }
         },
         methods: {
@@ -102,6 +126,41 @@
             loadRecentImages() {
                 this.recentImages = localStorageService.getRecentImages();
             },
+            async loadLibraryImages() {
+                this.isLibraryLoading = true;
+                try {
+                    const response = await fetch('https://jmfc.dynseo.com/api/image-library.php', {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const payload = await response.json().catch(() => ({}));
+                    if (!response.ok) {
+                        const message = payload && payload.message ? payload.message : 'Failed to load library';
+                        throw new Error(message);
+                    }
+                    const items = Array.isArray(payload.images) ? payload.images : [];
+                    this.libraryImages = items
+                        .map((item) => {
+                            const resolvedUrl = this.normaliseLibraryUrl(item.publicUrl || item.url);
+                            if (!resolvedUrl) {
+                                return null;
+                            }
+                            return {
+                                id: item.id,
+                                name: item.name,
+                                previewUrl: resolvedUrl,
+                                sourceUrl: resolvedUrl
+                            };
+                        })
+                        .filter(Boolean);
+                } catch (error) {
+                    log.warn('Unable to load shared image library', error);
+                    this.libraryImages = [];
+                } finally {
+                    this.isLibraryLoading = false;
+                }
+            },
             setImageData(imageData) {
                 if (!imageData) {
                     return;
@@ -113,6 +172,88 @@
                 this.gridElement.image.searchProviderName = null;
                 this.gridElement.image.searchProviderOptions = [];
                 this.recentImages = localStorageService.addRecentImage(imageData);
+            },
+            async useLibraryImage(image) {
+                if (!image || !image.sourceUrl) {
+                    return;
+                }
+
+                const resolvedUrl = image.sourceUrl;
+                const base64 = await this.fetchImageAsBase64(resolvedUrl);
+
+                if (base64) {
+                    this.setImageData(base64);
+                    return;
+                }
+
+                this.gridElement.image = new GridImage({
+                    data: null,
+                    url: resolvedUrl,
+                    author: image.author || null,
+                    authorURL: image.authorURL || null,
+                    searchProviderName: null,
+                    searchProviderOptions: []
+                });
+                this.$nextTick(() => this.$forceUpdate());
+            },
+            async fetchImageAsBase64(url) {
+                if (!url) {
+                    return null;
+                }
+
+                try {
+                    const response = await fetch(url, {
+                        mode: 'cors',
+                        credentials: 'include'
+                    });
+
+                    if (!response.ok) {
+                        return null;
+                    }
+
+                    const blob = await response.blob();
+                    if (!blob || !blob.type || !blob.type.startsWith('image/')) {
+                        return null;
+                    }
+
+                    return await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = () => reject(reader.error);
+                        reader.readAsDataURL(blob);
+                    });
+                } catch (error) {
+                    log.warn('Unable to convert shared image to base64', error);
+                    return null;
+                }
+            },
+            normaliseLibraryUrl(rawUrl) {
+                if (!rawUrl || typeof rawUrl !== 'string') {
+                    return null;
+                }
+
+                if (/^https?:\/\//i.test(rawUrl)) {
+                    return rawUrl;
+                }
+
+                if (rawUrl.startsWith('//')) {
+                    const protocol = window.location.protocol && window.location.protocol.startsWith('http')
+                        ? window.location.protocol
+                        : 'https:';
+                    return protocol + rawUrl;
+                }
+
+                if (rawUrl.startsWith('/')) {
+                    if (window.location.origin && window.location.origin.startsWith('http')) {
+                        return window.location.origin + rawUrl;
+                    }
+                    if (this.constants.IS_ENVIRONMENT_PROD) {
+                        return 'https://jmfc.dynseo.com' + rawUrl;
+                    }
+                    return 'https://localhost' + rawUrl;
+                }
+
+                return rawUrl;
             },
             setBase64(base64) {
                 if (!base64) {
@@ -161,6 +302,7 @@
                 this.search(this.imageSearch);
             }
             this.loadRecentImages();
+            this.loadLibraryImages();
         },
         beforeDestroy() {
             helpService.revertToLastLocation();

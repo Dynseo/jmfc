@@ -142,6 +142,13 @@
                     </div>
                 </div>
             </div>
+            <div class="srow" v-if="isAdminUser">
+                <div class="eleven columns">
+                    <h3 class="mt-2">{{ $t('imageLibrary') }}</h3>
+                    <p>{{ $t('imageLibraryIntro') }}</p>
+                    <button @click="navigateToImageLibrary">{{ $t('imageLibraryOpen') }}</button>
+                </div>
+            </div>
             <!-- <div class="srow">
                 <div class="eleven columns">
                     <button @click="navigateToLogs">Voir les logs</button>
@@ -169,6 +176,7 @@
     import { gridUtil } from '../../js/util/gridUtil.js';
     import {helpService} from "../../js/service/helpService";
     import {Router} from "../../js/router.js";
+    import { loginService } from '../../js/service/loginService.js';
 
     
     let KEY_SETTINGS_SHOW_ALL_VOICES = "KEY_SETTINGS_SHOW_ALL_VOICES";
@@ -201,7 +209,8 @@
                 constants: constants,
                 MetaData: MetaData,
                 TextConfig: TextConfig,
-                util: util
+                util: util,
+                isAdminUser: loginService.isAdmin()
             }
         },
         computed: {
@@ -326,6 +335,9 @@
             },
             navigateToLogs() {
                 Router.toLogs();
+            },
+            navigateToImageLibrary() {
+                Router.to('#admin/library');
             }
         },
         async mounted() {
@@ -343,6 +355,7 @@
             thiz.gridLanguages = gridUtil.getGridsLangs(grids);
             thiz.voices = await speechService.getVoicesInitialized();
             thiz.selectVoices = thiz.getSelectVoices();
+            thiz.isAdminUser = loginService.isAdmin();
         }
     }
 </script>

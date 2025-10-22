@@ -70,7 +70,6 @@ function getAuthToken() {
     if (token) {
         return token;
     }
-
     // Fallback: essayer de récupérer depuis localStorage si nécessaire
     try {
         const superloginData = JSON.parse(localStorage.getItem('superlogin.session'));

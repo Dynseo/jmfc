@@ -15,6 +15,7 @@ import RegisterView from '../vue-components/views/registerView.vue';
 import WelcomeView from '../vue-components/views/welcomeView.vue';
 import AboutView from '../vue-components/views/aboutView.vue';
 import SettingsView from '../vue-components/views/settingsView.vue';
+import ImageLibraryAdminView from '../vue-components/views/imageLibraryAdminView.vue';
 import SubscriptionRequiredView from '../vue-components/views/subscriptionRequiredView.vue';
 import { databaseService } from './service/data/databaseService';
 import { localStorageService } from './service/data/localStorageService';
@@ -42,6 +43,7 @@ Router.VIEWS = {
     AllGridsView: AllGridsView,
     GridView: GridView,
     GridEditView: GridEditView,
+    ImageLibraryAdminView: ImageLibraryAdminView,
     // LogView: LogView
 }
 
@@ -126,6 +128,10 @@ Router.init = function (injectIdParam, initialHash) {
         settings: function () {
             //TODO add correct help location
             loadVueView(SettingsView);
+        },
+        'admin/library': function () {
+            helpService.setHelpLocation('', '#settings');
+            loadVueView(ImageLibraryAdminView);
         },
         help: function () {
             loadVueView(HelpView);

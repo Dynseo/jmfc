@@ -67,6 +67,33 @@ loginService.getAuthToken = function () {
     return null;
 };
 
+loginService.getSessionInfo = function () {
+    if (_loginInfo) {
+        return _loginInfo;
+    }
+    try {
+        const session = JSON.parse(localStorage.getItem('superlogin.session'));
+        if (session && typeof session === 'object') {
+            return session;
+        }
+    } catch (e) {
+        log.debug('Unable to read superlogin session from storage', e);
+    }
+    return null;
+};
+
+loginService.hasRole = function (role) {
+    const session = loginService.getSessionInfo();
+    if (!session || !Array.isArray(session.roles)) {
+        return false;
+    }
+    return session.roles.includes(role);
+};
+
+loginService.isAdmin = function () {
+    return loginService.hasRole('admin') || loginService.hasRole('superadmin');
+};
+
 /**
  * logs in into remote couchdb (superlogin) and initializes local user database
  * @param plainPassword plain user password as typed in in password field

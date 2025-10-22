@@ -17,7 +17,7 @@
                     
                     <button @click="logout" class="btn btn-secondary">
                         <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
-                        {{ $t('logout') }}
+                        {{ $t('gotowelcome') }}
                     </button>
                 </div>
                 
