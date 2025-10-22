@@ -7,7 +7,7 @@ $configPath = '/var/www/jmfc/config/config.php';
 $config = file_exists($configPath) ? require $configPath : null;
 $allowedOrigins = $config['allowed_origins'] ?? [];
 
-jmfc_send_cors_headers($allowedOrigins);
+// jmfc_send_cors_headers($allowedOrigins);
 $libraryBaseUrl = jmfc_compute_library_base_url($allowedOrigins);
 
 // Handle CORS preflight if needed (kept consistent with other API endpoints)
@@ -326,23 +326,23 @@ function handleDelete(string $indexFile, string $libraryDir, array $session): vo
     ]);
 }
 
-function jmfc_send_cors_headers(array $allowedOrigins): void
-{
-    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-    $allowAny = in_array('*', $allowedOrigins, true);
+// function jmfc_send_cors_headers(array $allowedOrigins): void
+// {
+//     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+//     $allowAny = in_array('*', $allowedOrigins, true);
 
-    if ($allowAny) {
-        header('Access-Control-Allow-Origin: *');
-    } elseif ($origin && in_array($origin, $allowedOrigins, true)) {
-        header('Access-Control-Allow-Origin: ' . $origin);
-        header('Vary: Origin');
-    }
+//     if ($allowAny) {
+//         header('Access-Control-Allow-Origin: *');
+//     } elseif ($origin && in_array($origin, $allowedOrigins, true)) {
+//         header('Access-Control-Allow-Origin: ' . $origin);
+//         header('Vary: Origin');
+//     }
 
-    header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, Authorization, Accept');
-    header('Access-Control-Expose-Headers: Content-Type');
-    header('Access-Control-Max-Age: 86400');
-}
+//     header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
+//     header('Access-Control-Allow-Headers: Content-Type, Authorization, Accept');
+//     header('Access-Control-Expose-Headers: Content-Type');
+//     header('Access-Control-Max-Age: 86400');
+// }
 
 function jmfc_compute_library_base_url(array $allowedOrigins): string
 {
