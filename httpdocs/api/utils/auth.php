@@ -40,7 +40,7 @@ if (!function_exists('jmfc_fetch_superlogin_session')) {
         if (!$superloginUrl) {
             $superloginUrl = 'https://jmfc.dynseo.com:3001';
         }
-        $endpoint = rtrim($superloginUrl, '/') . '/auth/session';
+        $endpoint = rtrim($superloginUrl, '/') . '/auth/user';
 
         $ch = curl_init($endpoint);
         $headers = [
