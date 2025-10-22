@@ -36,88 +36,111 @@ if (!function_exists('jmfc_fetch_superlogin_session')) {
             return null;
         }
 
-        $superloginUrl = getenv('JMFC_SUPERLOGIN_URL');
-        if (!$superloginUrl) {
-            $superloginUrl = 'https://jmfc.dynseo.com:3001';
-        }
+        $couchUrl = getenv('JMFC_COUCH_URL') ?: getenv('COUCH_DB_URL') ?: 'http://127.0.0.1:5984';
+        $couchUser = getenv('JMFC_COUCH_USER');
+        $couchPassword = getenv('JMFC_COUCH_PASSWORD');
+        $userDb = getenv('JMFC_COUCH_USER_DB');
 
-        $verifySslEnv = getenv('JMFC_SUPERLOGIN_VERIFY_SSL');
-        $verifySsl = true;
-        if ($verifySslEnv !== false && $verifySslEnv !== '') {
-            $value = trim((string)$verifySslEnv);
-            if ($value === '0' || strcasecmp($value, 'false') === 0 || strcasecmp($value, 'off') === 0 || strcasecmp($value, 'no') === 0) {
-                $verifySsl = false;
-            }
-        }
-
-        $caInfo = getenv('JMFC_SUPERLOGIN_CAINFO');
-    $paths = ['/auth/session', '/auth/user'];
-        $lastError = null;
-        $sawNotFound = false;
-
-        $isExpectedStatus = static function ($status) {
-            return in_array((int)$status, [401, 403, 404], true);
-        };
-
-        foreach ($paths as $path) {
-            $endpoint = rtrim($superloginUrl, '/') . $path;
-
-            $ch = curl_init($endpoint);
-            $headers = [
-                'Authorization: Bearer ' . $token,
-                'Accept: application/json'
-            ];
-            curl_setopt_array($ch, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTPHEADER => $headers,
-                CURLOPT_TIMEOUT => 10,
-                CURLOPT_SSL_VERIFYPEER => $verifySsl,
-                CURLOPT_SSL_VERIFYHOST => $verifySsl ? 2 : 0,
-            ]);
-
-            if ($caInfo) {
-                curl_setopt($ch, CURLOPT_CAINFO, $caInfo);
-            }
-
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $curlError = curl_error($ch);
-            curl_close($ch);
-
-            if ($response === false) {
-                $lastError = 'cURL error contacting ' . $endpoint . ': ' . $curlError;
-                continue;
-            }
-
-            if ($httpCode === 404) {
-                $sawNotFound = true;
-                continue;
-            }
-
-            if ($httpCode !== 200) {
-                if (!$isExpectedStatus($httpCode)) {
-                    error_log('Superlogin responded with HTTP ' . $httpCode . ' when validating token via ' . $endpoint);
+        if (($couchUser === false || $couchUser === null || $couchUser === '')
+            || ($couchPassword === false || $couchPassword === null)
+            || ($userDb === false || $userDb === null || $userDb === '')) {
+            $envPath = dirname(__DIR__, 3) . '/config/.env';
+            if (is_file($envPath) && is_readable($envPath)) {
+                $envValues = parse_ini_file($envPath, false, INI_SCANNER_RAW);
+                if (is_array($envValues)) {
+                    if (($couchUser === false || $couchUser === null || $couchUser === '') && isset($envValues['COUCH_DB_USER'])) {
+                        $couchUser = $envValues['COUCH_DB_USER'];
+                    }
+                    if (($couchPassword === false || $couchPassword === null) && isset($envValues['COUCH_DB_PASSWORD'])) {
+                        $couchPassword = $envValues['COUCH_DB_PASSWORD'];
+                    }
+                    if (($userDb === false || $userDb === null || $userDb === '') && isset($envValues['COUCH_DB_USER_DB'])) {
+                        $userDb = $envValues['COUCH_DB_USER_DB'];
+                    }
                 }
+            }
+        }
+
+        if ($couchUser === false || $couchUser === null || $couchUser === '') {
+            $couchUser = getenv('COUCH_DB_USER');
+        }
+
+        if ($couchPassword === false || $couchPassword === null) {
+            $couchPassword = getenv('COUCH_DB_PASSWORD');
+        }
+
+        if ($userDb === false || $userDb === null || $userDb === '') {
+            $userDb = getenv('COUCH_DB_USER_DB') ?: 'auth-users';
+        }
+
+        $viewUrl = rtrim($couchUrl, '/') . '/' . rawurlencode($userDb) . '/_design/auth/_view/session';
+        $query = '?key=' . urlencode(json_encode($token)) . '&include_docs=true&limit=1';
+
+        $ch = curl_init($viewUrl . $query);
+        $curlOptions = [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT => 10,
+        ];
+
+        if ($couchUser && $couchPassword !== null && $couchPassword !== false) {
+            $curlOptions[CURLOPT_USERPWD] = $couchUser . ':' . $couchPassword;
+            $curlOptions[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
+        }
+
+        curl_setopt_array($ch, $curlOptions);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        if ($response === false) {
+            error_log('CouchDB session lookup failed: ' . $curlError);
+            return null;
+        }
+
+        if ($httpCode !== 200) {
+            error_log('CouchDB responded with HTTP ' . $httpCode . ' during session lookup');
+            return null;
+        }
+
+        $payload = json_decode($response, true);
+        if (!is_array($payload) || empty($payload['rows'])) {
+            return null;
+        }
+
+        $row = $payload['rows'][0];
+        $doc = $row['doc'] ?? null;
+        if (!is_array($doc)) {
+            return null;
+        }
+
+        $sessionMap = $doc['session'] ?? [];
+        if (!is_array($sessionMap) || !isset($sessionMap[$token]) || !is_array($sessionMap[$token])) {
+            return null;
+        }
+
+        $sessionInfo = $sessionMap[$token];
+        if (isset($sessionInfo['expires'])) {
+            $expiresTs = is_numeric($sessionInfo['expires']) ? (int)$sessionInfo['expires'] : strtotime((string)$sessionInfo['expires']);
+            if ($expiresTs && $expiresTs < time()) {
                 return null;
             }
-
-            $session = json_decode($response, true);
-            if (!is_array($session)) {
-                $lastError = 'Unable to decode JSON from ' . $endpoint;
-                continue;
-            }
-
-            return $session;
         }
 
-        if ($lastError) {
-            error_log('Superlogin session fetch failed: ' . $lastError);
-        } elseif ($sawNotFound) {
-            // Both endpoints missing is most likely an outdated token or legacy Superlogin.
-            error_log('Superlogin session validation endpoints responded with 404. Treating token as invalid.');
+        $result = [
+            'user_id' => $doc['key'] ?? $doc['name'] ?? ($doc['username'] ?? null),
+            'roles' => isset($doc['roles']) && is_array($doc['roles']) ? $doc['roles'] : [],
+            'expires' => $sessionInfo['expires'] ?? null,
+            'provider' => $sessionInfo['provider'] ?? null
+        ];
+
+        if (isset($doc['profile'])) {
+            $result['profile'] = $doc['profile'];
         }
-        return null;
+
+        return $result;
     }
 }
 
