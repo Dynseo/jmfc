@@ -42,10 +42,13 @@ if (stripos($authHeader, 'Bearer ') === 0) {
     }
 }
 
-if (empty($token)) {
-    error_log('Auth failed: unable to extract bearer token');
+$requireToken = $config['auth']['require_token'] ?? true;
+
+$token = $requireToken ? jmfc_get_authorization_token() : null;
+
+if ($requireToken && empty($token)) {
     http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized', 'message' => 'No valid authorization header found']);
+    echo json_encode(['error' => 'Unauthorized']);
     exit;
 }
 
