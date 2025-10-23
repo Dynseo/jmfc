@@ -27,9 +27,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+function getAuthorizationHeaderValue(): string {
+    $headerValue = '';
+
+    if (function_exists('getallheaders')) {
+        foreach (getallheaders() as $name => $value) {
+            if (strcasecmp($name, 'Authorization') === 0) {
+                $headerValue = $value;
+                break;
+            }
+        }
+    }
+
+    if (!$headerValue && isset($_SERVER['HTTP_AUTHORIZATION'])) {
+        $headerValue = $_SERVER['HTTP_AUTHORIZATION'];
+    }
+
+    if (!$headerValue && isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        $headerValue = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+    }
+
+    return $headerValue;
+}
+
 // Vérification de l'authentification
-$headers = getallheaders();
-$auth_header = isset($headers['Authorization']) ? $headers['Authorization'] : '';
+$auth_header = getAuthorizationHeaderValue();
 
 if (!$auth_header || !preg_match('/Bearer\s+(.*)$/i', $auth_header, $matches)) {
     http_response_code(401);

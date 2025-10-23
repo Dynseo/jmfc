@@ -27,8 +27,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-$headers = getallheaders();
-$auth_header = isset($headers['Authorization']) ? $headers['Authorization'] : '';
+function getAuthorizationHeaderValue(): string {
+    $headerValue = '';
+
+    if (function_exists('getallheaders')) {
+        foreach (getallheaders() as $name => $value) {
+            if (strcasecmp($name, 'Authorization') === 0) {
+                $headerValue = $value;
+                break;
+            }
+        }
+    }
+
+    if (!$headerValue && isset($_SERVER['HTTP_AUTHORIZATION'])) {
+        $headerValue = $_SERVER['HTTP_AUTHORIZATION'];
+    }
+
+    if (!$headerValue && isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        $headerValue = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+    }
+
+    return $headerValue;
+}
+
+$auth_header = getAuthorizationHeaderValue();
 
 // error_log('Auth header: ' . $auth_header);
 
