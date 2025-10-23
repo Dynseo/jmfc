@@ -11,6 +11,7 @@ $allowedOrigins = $config['allowed_origins'] ?? [];
 $libraryBaseUrl = jmfc_compute_library_base_url($allowedOrigins);
 
 error_log('Image Library API accessed from ' . ($_SERVER['HTTP_ORIGIN'] ?? 'unknown origin'));
+error_log('Image Library API base URL computed as ' . $libraryBaseUrl);
 
 // Handle CORS preflight if needed (kept consistent with other API endpoints)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -20,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 $libraryDir = realpath(__DIR__ . '/../app/library-images');
 if ($libraryDir === false) {
+    error_log('Image Library directory does not exist, attempting to create it.');
     // Directory might not exist yet (e.g., fresh install)
     $libraryDir = __DIR__ . '/../app/library-images';
     if (!is_dir($libraryDir)) {
@@ -33,6 +35,8 @@ if ($libraryDir === false) {
         }
     }
 }
+
+error_log('Image Library directory set to ' . $libraryDir);
 
 $indexFile = $libraryDir . '/index.json';
 if (!file_exists($indexFile)) {
