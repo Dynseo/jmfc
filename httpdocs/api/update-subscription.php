@@ -27,20 +27,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-$headers = getallheaders();
-$auth_header = isset($headers['Authorization']) ? $headers['Authorization'] : '';
+$headers = function_exists('getallheaders') ? getallheaders() : [];
+$headers = array_change_key_case($headers, CASE_LOWER);
 
-if (!$auth_header || !preg_match('/Bearer\s+(.*)$/i', $auth_header, $matches)) {
-    http_response_code(401);
-    error_log("Unauthorized access attempt - Missing or invalid Authorization header");
-    echo json_encode([
-        'error' => 'Unauthorized',
-        'message' => 'No valid authorization header found'
-    ]);
-    exit;
+$authHeader = trim($headers['authorization'] ?? '');
+$authHeader = preg_replace('/[\x00-\x1F\x7F]/', '', $authHeader); // strip control chars
+
+if (stripos($authHeader, 'Bearer ') === 0) {
+    $token = trim(substr($authHeader, 7));
+} else {
+    $parts = preg_split('/\s+/', $authHeader, 2);
+    if (count($parts) >= 2 && strcasecmp($parts[0], 'Bearer') === 0) {
+        $token = trim($parts[1]);
+    }
 }
 
-$token = $matches[1];
+if (empty($token)) {
+    error_log('Auth failed: unable to extract bearer token');
+    http_response_code(401);
+    echo json_encode(['error' => 'Unauthorized', 'message' => 'No valid authorization header found']);
+    exit;
+}
 
 // Lecture des données JSON
 $json_data = file_get_contents('php://input');
