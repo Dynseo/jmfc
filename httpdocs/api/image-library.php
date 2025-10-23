@@ -10,6 +10,8 @@ $allowedOrigins = $config['allowed_origins'] ?? [];
 // jmfc_send_cors_headers($allowedOrigins);
 $libraryBaseUrl = jmfc_compute_library_base_url($allowedOrigins);
 
+error_log('Image Library API accessed from ' . ($_SERVER['HTTP_ORIGIN'] ?? 'unknown origin'));
+
 // Handle CORS preflight if needed (kept consistent with other API endpoints)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -69,6 +71,7 @@ function handleGet(string $indexFile, string $baseUrl): void
 {
     $images = loadImages($indexFile);
     $images = jmfc_prepare_images_for_response($images, $baseUrl);
+    error_log('Image Library GET returning ' . count($images) . ' images.');
     echo json_encode([
         'images' => $images
     ]);
@@ -151,6 +154,7 @@ function handlePost(string $indexFile, string $libraryDir, array $session, strin
     }
 
     http_response_code(201);
+    error_log('Image Library API created new image: ' . $newImage['id']);
     echo json_encode([
         'image' => jmfc_prepare_image_for_response($newImage, $baseUrl)
     ]);
