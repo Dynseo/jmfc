@@ -498,13 +498,14 @@ async function loadLanguage(useLang, secondTry) {
     if (!useLang || loadedLanguages.includes(useLang)) {
         return;
     }
-    let url = 'lang/i18n.' + useLang + '.json';
+    let resolvedUrl = null;
     try {
-        let messages = await $.get(url);
+        let result = await fetchLanguageFile(useLang);
+        resolvedUrl = result.url;
         loadedLanguages.push(useLang);
-        vueI18n.setLocaleMessage(useLang, messages);
+        vueI18n.setLocaleMessage(useLang, result.messages);
     } catch (e) {
-        if (!secondTry) {
+        if (!secondTry && useLang !== fallbackLang) {
             await loadLanguage(fallbackLang, true);
         }
         return;
@@ -519,8 +520,24 @@ async function loadLanguage(useLang, secondTry) {
             }
         }
     });
-    let module = await import("./serviceWorkerService.js");
-    module.serviceWorkerService.cacheUrl(url);
+    if (resolvedUrl) {
+        let module = await import("./serviceWorkerService.js");
+        module.serviceWorkerService.cacheUrl(resolvedUrl);
+    }
+}
+
+async function fetchLanguageFile(useLang) {
+    let candidates = [`lang/i18n.${useLang}.json`, `app/lang/i18n.${useLang}.json`];
+    let lastError = null;
+    for (let candidate of candidates) {
+        try {
+            let messages = await $.get(candidate);
+            return { url: candidate, messages: messages };
+        } catch (e) {
+            lastError = e;
+        }
+    }
+    throw lastError;
 }
 
 async function getUserSettings() {
