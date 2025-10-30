@@ -11,6 +11,8 @@ import AllGridsView from '../vue-components/views/allGridsView.vue';
 import GridEditView from '../vue-components/views/gridEditView.vue';
 import GridView from '../vue-components/views/gridView.vue';
 import LoginView from '../vue-components/views/loginView.vue';
+import ForgotPasswordView from '../vue-components/views/forgotPasswordView.vue';
+import ResetPasswordView from '../vue-components/views/resetPasswordView.vue';
 import RegisterView from '../vue-components/views/registerView.vue';
 import WelcomeView from '../vue-components/views/welcomeView.vue';
 import AboutView from '../vue-components/views/aboutView.vue';
@@ -26,7 +28,7 @@ import { constants } from './util/constants.js';
 import { urlParamService } from './service/urlParamService';
 import { guardNavigation } from './navigationGuard.js';
 
-let NO_DB_VIEWS = ['#login', '#register', '#welcome', '#add', '#about', '#help', '#outdated', '#subscription'];
+let NO_DB_VIEWS = ['#login', '#register', '#welcome', '#add', '#about', '#help', '#outdated', '#subscription', '#forgot-password', '#password-reset'];
 
 let Router = {};
 let navigoInstance = null;
@@ -44,6 +46,8 @@ Router.VIEWS = {
     GridView: GridView,
     GridEditView: GridEditView,
     ImageLibraryAdminView: ImageLibraryAdminView,
+    ForgotPasswordView: ForgotPasswordView,
+    ResetPasswordView: ResetPasswordView,
     // LogView: LogView
 }
 
@@ -107,6 +111,18 @@ Router.init = function (injectIdParam, initialHash) {
             helpService.setHelpLocation('', '#main');
             //helpService.setHelpLocation('02_navigation', '#change-user-view');
             loadVueView(LoginView);
+        },
+        'forgot-password': function () {
+            helpService.setHelpLocation('', '#main');
+            loadVueView(ForgotPasswordView);
+        },
+        'password-reset/:token': function (params) {
+            helpService.setHelpLocation('', '#main');
+            loadVueView(ResetPasswordView, params);
+        },
+        'password-reset': function () {
+            helpService.setHelpLocation('', '#main');
+            loadVueView(ResetPasswordView);
         },
         register: function () {
             helpService.setHelpLocation('', '#main');
@@ -336,10 +352,23 @@ function getValidHash() {
     let hashToUse = location.hash;
     if (!databaseService.getCurrentUsedDatabase()) {
         let toLogin = localStorageService.getLastActiveUser() || localStorageService.getSavedUsers().length > 0;
-        hashToUse = NO_DB_VIEWS.includes(hashToUse) ? hashToUse : null;
+        const normalizedHash = normalizeHash(hashToUse);
+        hashToUse = NO_DB_VIEWS.includes(normalizedHash) ? hashToUse : null;
         hashToUse = hashToUse || (toLogin ? '#login' : '#welcome');
     }
     return hashToUse;
+}
+
+function normalizeHash(hash) {
+    if (!hash) {
+        return hash;
+    }
+    let normalized = hash.split('?')[0];
+    let slashIndex = normalized.lastIndexOf('/');
+    if (slashIndex > -1) {
+        normalized = normalized.substring(0, slashIndex);
+    }
+    return normalized;
 }
 
 function getHash() {

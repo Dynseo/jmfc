@@ -149,6 +149,18 @@ app.use('/user/validate-username/:name', async (req, res, next) => {
 
 app.use('/api/infotree', infoTreeAPI.getRouter(config.dbServer.protocol, config.dbServer.host));
 
+app.get('/password-reset/:token', (req, res) => {
+    const { token } = req.params;
+    if (!token) {
+        return res.redirect('/#/forgot-password');
+    }
+    res.redirect(`/#/password-reset/${encodeURIComponent(token)}`);
+});
+
+app.get('/password-reset', (req, res) => {
+    res.redirect('/#/forgot-password');
+});
+
 if (useSSL) {
     let privateKey = fs.readFileSync(process.env.PATH_TO_KEY, 'utf8');
     let certificate = fs.readFileSync(process.env.PATH_TO_CERT, 'utf8');

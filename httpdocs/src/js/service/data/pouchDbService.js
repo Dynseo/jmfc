@@ -294,16 +294,28 @@ pouchDbService.isSyncEnabled = function () {
 
 pouchDbService.pauseSync = function () {
     _pausedSyncManually = true;
-    getPouchDbAdapter().cancelSync();
+    let adapter = safeGetPouchDbAdapter();
+    if (!adapter) {
+        return;
+    }
+    adapter.cancelSync();
 }
 
 pouchDbService.resumeSync = function () {
     _pausedSyncManually = false;
-    getPouchDbAdapter().resumeSync(_remoteCouchAddress);
+    let adapter = safeGetPouchDbAdapter();
+    if (!adapter) {
+        return;
+    }
+    adapter.resumeSync(_remoteCouchAddress);
 }
 
 function getDbToUse() {
-    return getPouchDbAdapter().getDbToUse();
+    let adapter = safeGetPouchDbAdapter();
+    if (!adapter) {
+        throw 'Using pouchDbService uninitialized is not possible. First initialize a database by using pouchDbService.initDatabase() or pouchDbService.createDatabase().';
+    }
+    return adapter.getDbToUse();
 }
 
 function getPouchDbAdapter() {
@@ -311,6 +323,18 @@ function getPouchDbAdapter() {
         throw 'Using pouchDbService uninitialized is not possible. First initialize a database by using pouchDbService.initDatabase() or pouchDbService.createDatabase().';
     }
     return _pouchDbAdapter;
+}
+
+function safeGetPouchDbAdapter() {
+    if (!_pouchDbAdapter) {
+        return null;
+    }
+    try {
+        _pouchDbAdapter.getDbToUse();
+        return _pouchDbAdapter;
+    } catch (e) {
+        return null;
+    }
 }
 
 /**
@@ -350,11 +374,12 @@ function cancelSyncInternal() {
         clearTimeout(_resumeSyncTimeoutHandler);
         _resumeSyncTimeoutHandler = null;
     }
-    if (
-        !getPouchDbAdapter().isUsingLocalDb() ||
-        getPouchDbAdapter().getSyncState() === constants.DB_SYNC_STATE_SYNCINC
-    ) {
-        getPouchDbAdapter().cancelSync();
+    let adapter = safeGetPouchDbAdapter();
+    if (!adapter) {
+        return;
+    }
+    if (!adapter.isUsingLocalDb() || adapter.getSyncState() === constants.DB_SYNC_STATE_SYNCINC) {
+        adapter.cancelSync();
     }
 }
 
@@ -368,9 +393,17 @@ function resumeSyncInternal() {
     if (_pausedSyncManually) {
         return;
     }
-    let timeout = getPouchDbAdapter().wasCurrentDatabaseSynced() ? 0 : _lastQueryTime + 1000;
+    let adapter = safeGetPouchDbAdapter();
+    if (!adapter) {
+        return;
+    }
+    let timeout = adapter.wasCurrentDatabaseSynced() ? 0 : _lastQueryTime + 1000;
     _resumeSyncTimeoutHandler = setTimeout(() => {
-        getPouchDbAdapter().resumeSync();
+        let innerAdapter = safeGetPouchDbAdapter();
+        if (!innerAdapter) {
+            return;
+        }
+        innerAdapter.resumeSync();
     }, timeout);
 }
 

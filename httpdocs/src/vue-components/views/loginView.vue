@@ -124,6 +124,7 @@
                     <div class="eleven columns offset-by-four">
                         <span v-show="allUsersList.length === 0">{{ $t('noAccount') }}</span>
                         <span v-show="allUsersList.length > 0">{{ $t('addNewAccount') }}</span>
+                        <a href="#forgot-password">{{ $t('forgotPassword') }}</a><br>
                         <a href="#register">{{ $t('registernow') }}</a><br>
                         <a href="#welcome">{{ $t('gotowelcome') }}</a>
                     </div>

@@ -28,6 +28,10 @@ loginService.ERROR_CODE_UNAUTHORIZED = 'ERROR_CODE_UNAUTHORIZED';
 loginService.ERROR_CODE_INACTIVE_ACCOUNT = 'ERROR_CODE_INACTIVE_ACCOUNT';
 loginService.ERROR_CODE_LOCKED = 'ERROR_CODE_LOCKED';
 loginService.ERROR_CODE_NETWORK_ERROR = 'ERROR_CODE_NETWORK_ERROR';
+loginService.ERROR_CODE_EMAIL_REQUIRED = 'ERROR_CODE_EMAIL_REQUIRED';
+loginService.ERROR_CODE_PASSWORD_REQUIRED = 'ERROR_CODE_PASSWORD_REQUIRED';
+loginService.ERROR_CODE_RESET_TOKEN_INVALID = 'ERROR_CODE_RESET_TOKEN_INVALID';
+loginService.ERROR_CODE_TOKEN_REQUIRED = 'ERROR_CODE_TOKEN_REQUIRED';
 superlogin.configure(getConfig());
 
 
@@ -119,6 +123,74 @@ loginService.loginPlainPassword = function (user, plainPassword, saveUser) {
 loginService.loginHashedPassword = function (user, hashedPassword, saveUser) {
     _tryUser = user;
     return loginHashedPasswordInternal(user, hashedPassword, saveUser);
+};
+
+/**
+ * requests a password reset email via superlogin
+ * @param email the account email to send reset instructions to
+ * @return {Promise<void>}
+ */
+loginService.requestPasswordReset = function (email) {
+    let trimmedEmail = (email || '').trim();
+    if (!trimmedEmail) {
+        return Promise.reject(loginService.ERROR_CODE_EMAIL_REQUIRED);
+    }
+
+    return superlogin
+        .forgotPassword(trimmedEmail)
+        .catch((reason) => {
+            // For privacy, treat "user not found" as success.
+            if (reason && (reason.status === 404 || (typeof reason.message === 'string' && reason.message.toLowerCase().includes('not found')))) {
+                log.info('Password reset requested for unknown email. Responding as success.');
+                return;
+            }
+
+            log.warn('Password reset request failed', reason);
+            throw reasonToErrorCode(reason) || reason;
+        });
+};
+
+/**
+ * resets a user password given a valid reset token
+ * @param token reset token sent via email
+ * @param newPlainPassword new password in plaintext
+ * @return {Promise<void>}
+ */
+loginService.resetPassword = function (token, newPlainPassword) {
+    if (!token) {
+        return Promise.reject(loginService.ERROR_CODE_TOKEN_REQUIRED);
+    }
+    if (!newPlainPassword) {
+        return Promise.reject(loginService.ERROR_CODE_PASSWORD_REQUIRED);
+    }
+
+    let hashedPassword = encryptionService.getUserPasswordHash(newPlainPassword);
+    return superlogin
+        .resetPassword({
+            token: token,
+            password: hashedPassword,
+            confirmPassword: hashedPassword
+        })
+        .catch((reason) => {
+            if (reason && reason.status === 400) {
+                throw loginService.ERROR_CODE_RESET_TOKEN_INVALID;
+            }
+            if (
+                reason &&
+                typeof reason.message === 'string' &&
+                reason.message.toLowerCase().includes('network')
+            ) {
+                throw loginService.ERROR_CODE_NETWORK_ERROR;
+            }
+            if (
+                reason &&
+                typeof reason.error === 'string' &&
+                reason.error.toLowerCase().includes('network')
+            ) {
+                throw loginService.ERROR_CODE_NETWORK_ERROR;
+            }
+            throw reasonToErrorCode(reason) || reason;
+        });
 };
 
 /**
