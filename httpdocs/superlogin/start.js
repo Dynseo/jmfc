@@ -41,6 +41,7 @@ const disableEmails = parseBoolean(process.env.SUPERLOGIN_DISABLE_EMAIL);
 const mailerSecure = parseBoolean(process.env.MAILER_SECURE);
 const mailerPort = parseInteger(process.env.MAILER_PORT);
 const mailerDebug = parseBoolean(process.env.MAILER_DEBUG);
+const appPublicUrl = process.env.APP_PUBLIC_URL || 'https://jmfc.dynseo.com';
 
 const corsOptions = {
     origin: ['https://jmfc.dynseo.com'],
@@ -152,13 +153,13 @@ app.use('/api/infotree', infoTreeAPI.getRouter(config.dbServer.protocol, config.
 app.get('/password-reset/:token', (req, res) => {
     const { token } = req.params;
     if (!token) {
-        return res.redirect('/#/forgot-password');
+        return res.redirect(`${appPublicUrl}/#/forgot-password`);
     }
-    res.redirect(`/#/password-reset/${encodeURIComponent(token)}`);
+    res.redirect(`${appPublicUrl}/#/password-reset/${encodeURIComponent(token)}`);
 });
 
 app.get('/password-reset', (req, res) => {
-    res.redirect('/#/forgot-password');
+    res.redirect(`${appPublicUrl}/#/forgot-password`);
 });
 
 if (useSSL) {
