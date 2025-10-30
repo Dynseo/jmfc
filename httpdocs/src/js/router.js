@@ -28,7 +28,7 @@ import { constants } from './util/constants.js';
 import { urlParamService } from './service/urlParamService';
 import { guardNavigation } from './navigationGuard.js';
 
-let NO_DB_VIEWS = ['#login', '#register', '#welcome', '#add', '#about', '#help', '#outdated', '#subscription', '#forgot-password', '#password-reset'];
+let NO_DB_VIEWS = ['#login', '#register', '#welcome', '#add', '#about', '#help', '#outdated', '#subscription', '#forgot-password', '#/forgot-password', '#password-reset', '#/password-reset'];
 
 let Router = {};
 let navigoInstance = null;
@@ -364,9 +364,13 @@ function normalizeHash(hash) {
         return hash;
     }
     let normalized = hash.split('?')[0];
-    let slashIndex = normalized.lastIndexOf('/');
-    if (slashIndex > -1) {
-        normalized = normalized.substring(0, slashIndex);
+    const segments = normalized.split('/');
+    if (segments.length > 2) {
+        segments.pop();
+        normalized = segments.join('/');
+    }
+    if (normalized.startsWith('#/')) {
+        normalized = `#${normalized.substring(2)}`;
     }
     return normalized;
 }
