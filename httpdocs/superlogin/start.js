@@ -13,6 +13,35 @@ dotenv.config({ path: '../config/.env' });
 
 const USERNAME_REGEX = /^[a-z0-9][a-z0-9_-]{2,15}$/;; // also see src/js/util/constants.js:8
 
+function parseBoolean(value, defaultValue = false) {
+    if (typeof value === 'boolean') {
+        return value;
+    }
+    if (typeof value === 'string') {
+        const lowered = value.trim().toLowerCase();
+        if (lowered === 'true') {
+            return true;
+        }
+        if (lowered === 'false') {
+            return false;
+        }
+    }
+    return defaultValue;
+}
+
+function parseInteger(value) {
+    if (value === undefined || value === null || value === '') {
+        return undefined;
+    }
+    const parsed = parseInt(value, 10);
+    return Number.isNaN(parsed) ? undefined : parsed;
+}
+
+const disableEmails = parseBoolean(process.env.SUPERLOGIN_DISABLE_EMAIL);
+const mailerSecure = parseBoolean(process.env.MAILER_SECURE);
+const mailerPort = parseInteger(process.env.MAILER_PORT);
+const mailerDebug = parseBoolean(process.env.MAILER_DEBUG);
+
 const corsOptions = {
     origin: ['https://jmfc.dynseo.com'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -31,7 +60,7 @@ app.use(cors(corsOptions));
 let config = {
     testMode: {
         // Use a stub transport so no email is actually sent
-        noEmail: true,
+        noEmail: disableEmails,
         // Displays debug information in the oauth dialogs
         oauthDebug: false,
         // Logs out-going emails to the console
@@ -62,8 +91,10 @@ let config = {
         fromEmail: process.env.MAILER_FROM_EMAIL,
         options: {
             host: process.env.MAILER_HOST,
-            port: process.env.MAILER_PORT,
-            secure: process.env.MAILER_SECURE,
+            port: mailerPort,
+            secure: mailerSecure,
+            logger: mailerDebug,
+            debug: mailerDebug,
             auth: {
                 user: process.env.MAILER_USER,
                 pass: process.env.MAILER_PASS
