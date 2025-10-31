@@ -38,10 +38,48 @@ function parseInteger(value) {
 }
 
 const disableEmails = parseBoolean(process.env.SUPERLOGIN_DISABLE_EMAIL);
-const mailerSecure = parseBoolean(process.env.MAILER_SECURE);
-const mailerPort = parseInteger(process.env.MAILER_PORT);
+const rawMailerSecure = process.env.MAILER_SECURE;
+let mailerSecure = parseBoolean(rawMailerSecure);
+const mailerPort = parseInteger(process.env.MAILER_PORT) ?? 587;
+if (rawMailerSecure === undefined && mailerPort === 465) {
+    mailerSecure = true;
+}
 const mailerDebug = parseBoolean(process.env.MAILER_DEBUG);
+const mailerRequireTLS = parseBoolean(process.env.MAILER_REQUIRE_TLS, mailerPort === 587);
+const mailerConnectionTimeout = parseInteger(process.env.MAILER_CONNECTION_TIMEOUT);
+const mailerGreetingTimeout = parseInteger(process.env.MAILER_GREETING_TIMEOUT);
+const mailerSocketTimeout = parseInteger(process.env.MAILER_SOCKET_TIMEOUT);
 const appPublicUrl = process.env.APP_PUBLIC_URL || 'https://jmfc.dynseo.com';
+
+const mailerOptions = {
+    host: process.env.MAILER_HOST,
+    port: mailerPort,
+    secure: mailerPort === 587 ? false : mailerSecure,
+    logger: mailerDebug,
+    debug: mailerDebug,
+    auth: {
+        user: process.env.MAILER_USER,
+        pass: process.env.MAILER_PASS
+    }
+};
+
+if (mailerPort === 587) {
+    mailerOptions.requireTLS = mailerRequireTLS;
+} else if (process.env.MAILER_REQUIRE_TLS !== undefined) {
+    mailerOptions.requireTLS = mailerRequireTLS;
+}
+
+if (mailerConnectionTimeout !== undefined) {
+    mailerOptions.connectionTimeout = mailerConnectionTimeout;
+}
+
+if (mailerGreetingTimeout !== undefined) {
+    mailerOptions.greetingTimeout = mailerGreetingTimeout;
+}
+
+if (mailerSocketTimeout !== undefined) {
+    mailerOptions.socketTimeout = mailerSocketTimeout;
+}
 
 const corsOptions = {
     origin: ['https://jmfc.dynseo.com'],
@@ -90,17 +128,7 @@ let config = {
     },
     mailer: {
         fromEmail: process.env.MAILER_FROM_EMAIL,
-        options: {
-            host: process.env.MAILER_HOST,
-            port: mailerPort,
-            secure: mailerSecure,
-            logger: mailerDebug,
-            debug: mailerDebug,
-            auth: {
-                user: process.env.MAILER_USER,
-                pass: process.env.MAILER_PASS
-            }
-        }
+        options: mailerOptions
     },
     emails: {
         confirmEmail: {
@@ -175,6 +203,9 @@ function logConfig() {
     console.log("starting with this config:");
     let logConfig = JSON.parse(JSON.stringify(config));
     logConfig.dbServer.password = '***';
+    if (logConfig.mailer && logConfig.mailer.options && logConfig.mailer.options.auth) {
+        logConfig.mailer.options.auth.pass = '***';
+    }
     console.log(JSON.stringify(logConfig));
 }
 
