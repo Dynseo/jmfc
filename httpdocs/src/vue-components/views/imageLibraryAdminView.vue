@@ -19,6 +19,39 @@
         <div class="srow content spaced">
             <h2>{{ $t('imageLibrary') }}</h2>
             <p>{{ $t('imageLibraryIntro') }}</p>
+            <div class="srow">
+                <label class="three columns">{{ $t('imageLibraryWebLinkLabel') || 'Web' }}</label>
+                <a href="https://jmfc.dynseo.com" target="_blank" rel="noopener" style="word-break:break-all;">
+                    {{ $t('imageLibraryOpenWeb') || 'Télécharger depuis le web' }}
+                </a>
+                <div class="eight columns file-column" style="display:flex;align-items:center;gap:0.5rem;">
+                    <input id="webLinkInput" type="text" readonly value="https://jmfc.dynseo.com" style="flex:1;padding:0.35em;border-radius:4px;border:1px solid rgba(0,0,0,0.1);" />
+                    <button
+                        type="button"
+                        class="spaced small"
+                        onclick="(function() { 
+                            const url='https://jmfc.dynseo.com'; 
+                            if(navigator.clipboard && navigator.clipboard.writeText){ 
+                                navigator.clipboard.writeText(url).then(function(){ 
+                                    alert('Lien copié'); }, function(){ fallbackCopy(); 
+                                }); 
+                            } else { 
+                                fallbackCopy(); 
+                            } function fallbackCopy(){ 
+                                const inp=document.getElementById('webLinkInput'); 
+                                if(!inp) { 
+                                    alert('Impossible de copier'); return; 
+                                } 
+                                inp.select(); 
+                                try{ document.execCommand('copy'); 
+                                alert('Lien copié'); 
+                            }catch(e){ 
+                                alert('Impossible de copier'); 
+                            } 
+                        }
+                    })()">{{ $t('copyLink') || 'Copier le lien' }}</button>
+                </div>
+            </div>
 
             <div v-if="statusMessage" :class="['status', statusType]">
                 {{ statusMessage }}
