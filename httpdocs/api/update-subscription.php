@@ -7,7 +7,7 @@ error_log("Request Method: " . $_SERVER['REQUEST_METHOD']);
 
 header('Content-Type: application/json');
 
-$config = require_once '/var/www/jmfc/config/config.php';
+$config = require_once __DIR__ . '/../../../config/config.php';
 
 // Configuration CORS
 $allowedOrigins = $config['allowed_origins'] ?? [];

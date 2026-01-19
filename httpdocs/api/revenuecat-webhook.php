@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 
-$config = require_once '/var/www/jmfc/config/config.php';
+$config = require_once __DIR__ . '/../../../config/config.php';
 
 // Log de la notification reçue
 error_log('RevenueCat Webhook called - Request Details:');

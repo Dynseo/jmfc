@@ -3,7 +3,7 @@ header('Content-Type: application/json');
 
 require_once __DIR__ . '/utils/auth.php';
 
-$configPath = '/var/www/jmfc/config/config.php';
+$configPath = __DIR__ . '/../../../config/config.php';
 $config = file_exists($configPath) ? require $configPath : null;
 $allowedOrigins = $config['allowed_origins'] ?? [];
 
