@@ -1,4 +1,5 @@
 let fs = require('fs');
+const path = require('path');
 let express = require('express');
 let http = require('http');
 let https = require('https');
@@ -6,10 +7,22 @@ let bodyParser = require('body-parser');
 let logger = require('morgan');
 let cors = require('cors');
 let { CouchAuth } = require('@klues/couch-auth');
-let useSSL = true;
+let useSSL = false;
 let infoTreeAPI = require('./infoTreeAPI/infoTreeAPI.js');
+console.log("DEBUG: Lancement du script start.js...");
 let dotenv = require('dotenv');
-dotenv.config({ path: '../config/.env' });
+console.log("DEBUG: Chargement du .env...");
+dotenv.config({ path: '../../../../config/.env' });
+console.log("DEBUG: DB_HOST est :", process.env.COUCH_DB_URL);
+console.log("DEBUG: Initialisation de Superlogin...");
+
+process.on('uncaughtException', (err) => {
+    const logMessage = `[${new Date().toISOString()}] CRASH: ${err.stack}\n`;
+    fs.appendFileSync(path.join(__dirname, 'error_log.txt'), logMessage);
+    process.exit(1);
+});
+
+console.log("Démarrage du script détecté...");
 
 const USERNAME_REGEX = /^[a-z0-9][a-z0-9_-]{2,15}$/;; // also see src/js/util/constants.js:8
 
@@ -100,6 +113,7 @@ let config = {
     testMode: {
         // Use a stub transport so no email is actually sent
         noEmail: disableEmails,
+		//noEmail: true,
         // Displays debug information in the oauth dialogs
         oauthDebug: false,
         // Logs out-going emails to the console
@@ -158,6 +172,9 @@ try {
     console.error('Error initializing CouchAuth:');
     console.error(err);
 }
+//logConfig();
+//let couchAuth = new CouchAuth(config);
+//app.use('/auth', couchAuth.router);
 
 
 app.use('/user/validate-username/:name', async (req, res, next) => {
@@ -190,13 +207,27 @@ app.get('/password-reset', (req, res) => {
     res.redirect(`${appPublicUrl}/#/forgot-password`);
 });
 
+const port = process.env.PORT || 3002;
+
 if (useSSL) {
-    let privateKey = fs.readFileSync(process.env.PATH_TO_KEY, 'utf8');
-    let certificate = fs.readFileSync(process.env.PATH_TO_CERT, 'utf8');
-    let credentials = { key: privateKey, cert: certificate };
-    https.createServer(credentials, app).listen(3001);
+    // Note : Généralement inutilisé sur Plesk car Nginx gère le SSL en amont
+    try {
+        const privateKey = fs.readFileSync(process.env.PATH_TO_KEY, 'utf8');
+        const certificate = fs.readFileSync(process.env.PATH_TO_CERT, 'utf8');
+        const credentials = { key: privateKey, cert: certificate };
+        https.createServer(credentials, app).listen(port, () => {
+            console.log(`Serveur HTTPS démarré sur le port ${port}`);
+        });
+    } catch (err) {
+        console.error("Erreur lors de la lecture des certificats SSL :", err);
+        // Repli sur HTTP pour éviter que l'app ne crash totalement
+        http.createServer(app).listen(port);
+    }
 } else {
-    http.createServer(app).listen(3002);
+    // C'est ce bloc qui doit s'exécuter sur Plesk
+    http.createServer(app).listen(port, () => {
+        console.log(`Serveur HTTP démarré sur le port ${port} (Passenger Mode)`);
+    });
 }
 
 function logConfig() {

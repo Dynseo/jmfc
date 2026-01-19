@@ -22,8 +22,8 @@ let _loginInProgress = false;
 let _lastParamHashedPw = null;
 let _lastParamSaveUser = null;
 let _serverUrl = constants.IS_ENVIRONMENT_PROD
-    ? 'https://app.jemefaiscomprendre.com:3001'
-    : 'https://app.jemefaiscomprendre.com:3001' //`http://${location.hostname}:3002`;
+    ? 'https://app.jemefaiscomprendre.com'
+    : 'https://app.jemefaiscomprendre.com' //`http://${location.hostname}:3002`;
 loginService.ERROR_CODE_UNAUTHORIZED = 'ERROR_CODE_UNAUTHORIZED';
 loginService.ERROR_CODE_INACTIVE_ACCOUNT = 'ERROR_CODE_INACTIVE_ACCOUNT';
 loginService.ERROR_CODE_LOCKED = 'ERROR_CODE_LOCKED';
