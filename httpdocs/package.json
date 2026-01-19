@@ -50,7 +50,7 @@
   "scripts": {
     "start-auth": "node superlogin/start.js",
     "start-auth-ssl": "node superlogin/start.js ssl",
-    "build": "webpack --config webpack.config.js --env production",
+    "build": "node ./node_modules/webpack/bin/webpack.js --config webpack.config.js --env production",
     "prepare": "husky install"
   },
   "homepage": "https://www.jemefaiscomprendre.com",
