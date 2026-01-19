@@ -94,7 +94,7 @@ export async function checkSubscription(username) {
             headers['Authorization'] = `Bearer ${token}`;
         }
         
-        const response = await fetch(`https://jmfc.dynseo.com/api/check-subscription.php?username=${username}`, {
+        const response = await fetch(`https://app.jemefaiscomprendre.com/api/check-subscription.php?username=${username}`, {
             headers: headers
         });
         if (!response.ok) {
@@ -134,7 +134,7 @@ export async function updateSubscriptionInDatabase(purchaseInfo) {
             headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch('https://jmfc.dynseo.com/api/update-subscription.php', {
+        const response = await fetch('https://app.jemefaiscomprendre.com/api/update-subscription.php', {
             method: 'POST',
             headers: headers,
             body: JSON.stringify(subscriptionData)

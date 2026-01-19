@@ -22,8 +22,8 @@ let _loginInProgress = false;
 let _lastParamHashedPw = null;
 let _lastParamSaveUser = null;
 let _serverUrl = constants.IS_ENVIRONMENT_PROD
-    ? 'https://jmfc.dynseo.com:3001'
-    : 'https://jmfc.dynseo.com:3001' //`http://${location.hostname}:3002`;
+    ? 'https://app.jemefaiscomprendre.com:3001'
+    : 'https://app.jemefaiscomprendre.com:3001' //`http://${location.hostname}:3002`;
 loginService.ERROR_CODE_UNAUTHORIZED = 'ERROR_CODE_UNAUTHORIZED';
 loginService.ERROR_CODE_INACTIVE_ACCOUNT = 'ERROR_CODE_INACTIVE_ACCOUNT';
 loginService.ERROR_CODE_LOCKED = 'ERROR_CODE_LOCKED';
@@ -294,7 +294,7 @@ loginService.register = function (user, plainPassword, saveUser, email) {
     log.debug('Starting registration process for user:', user);
     
     // 1. Enregistrement SQL
-    return fetch('https://jmfc.dynseo.com/api/register-user.php', {
+    return fetch('https://app.jemefaiscomprendre.com/api/register-user.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -436,7 +436,7 @@ function loginInternal(user, hashedPassword, saveUser) {
             _loginInfo = info;
            
             try {
-                const url = `https://jmfc.dynseo.com/api/check-subscription.php?username=${encodeURIComponent(info.user_id)}`;
+                const url = `https://app.jemefaiscomprendre.com/api/check-subscription.php?username=${encodeURIComponent(info.user_id)}`;
                 const headers = {
                     'Authorization': `Bearer ${info.token}`,
                     'Content-Type': 'application/json'

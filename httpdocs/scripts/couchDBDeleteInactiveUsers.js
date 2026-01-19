@@ -3,11 +3,11 @@ if (!process.argv[2]) {
     console.log('node couchDBDeleteInactiveUsers.js <COUCHDB_URL> [prod]');
     console.log('----');
     console.log('Examples:');
-    console.log('node couchDBDeleteInactiveUsers.js http://admin:admin@jmfc.dynseo.com:6984');
+    console.log('node couchDBDeleteInactiveUsers.js http://admin:admin@cdb.jemefaiscomprendre.com');
     return;
 }
 
-let couchUrl = process.argv[2] || 'http://admin:admin@jmfc.dynseo.com:6984';
+let couchUrl = process.argv[2] || 'http://admin:admin@cdb.jemefaiscomprendre.com';
 let prod = process.argv[3] === "prod";
 
 couchUrl = couchUrl.trim();

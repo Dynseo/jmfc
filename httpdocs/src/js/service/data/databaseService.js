@@ -372,7 +372,7 @@ databaseService.deleteUserAccount = function(username) {
             couchDBBaseUrl = session.serverInfo.publicURL;
         } else {
             // Fallback to hardcoded URL format
-            couchDBBaseUrl = 'https://jmfc.dynseo.com:6984';
+            couchDBBaseUrl = 'https://cdb.jemefaiscomprendre.com';
             log.warn('Using fallback CouchDB URL: ' + couchDBBaseUrl);
         }
         
@@ -583,7 +583,7 @@ databaseService.deleteUserAccount = function(username) {
         // Helper function to delete user from MySQL
         function deleteFromMySQL(username, resolve, reject) {
             $.ajax({
-                url: 'https://jmfc.dynseo.com/api/delete-user.php',
+                url: 'https://app.jemefaiscomprendre.com/api/delete-user.php',
                 type: 'DELETE',
                 data: JSON.stringify({ username }),
                 contentType: 'application/json',

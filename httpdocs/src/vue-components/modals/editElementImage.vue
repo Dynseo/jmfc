@@ -129,7 +129,7 @@
             async loadLibraryImages() {
                 this.isLibraryLoading = true;
                 try {
-                    const response = await fetch('https://jmfc.dynseo.com/api/image-library.php', {
+                    const response = await fetch('https://app.jemefaiscomprendre.com/api/image-library.php', {
                         headers: {
                             'Accept': 'application/json'
                         }
@@ -248,7 +248,7 @@
                         return window.location.origin + rawUrl;
                     }
                     if (this.constants.IS_ENVIRONMENT_PROD) {
-                        return 'https://jmfc.dynseo.com' + rawUrl;
+                        return 'https://app.jemefaiscomprendre.com' + rawUrl;
                     }
                     return 'https://localhost' + rawUrl;
                 }

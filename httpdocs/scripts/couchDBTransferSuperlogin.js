@@ -5,13 +5,13 @@ if (!process.argv[2] || !process.argv[2].trim()) {
     console.log(`node couchDBTransferSuperlogin.js <COUCHDB_URL> [prod]`);
     console.log("----");
     console.log("Example:");
-    console.log(`node couchDBTransferSuperlogin.js http://admin:admin@jmfc.dynseo.com:6984`);
-    console.log(`node couchDBTransferSuperlogin.js https://admin:admin@jmfc.dynseo.com:6984`);
+    console.log(`node couchDBTransferSuperlogin.js http://admin:admin@cdb.jemefaiscomprendre.com`);
+    console.log(`node couchDBTransferSuperlogin.js https://admin:admin@cdb.jemefaiscomprendre.com`);
     console.log(`actual database changes are only done with second parameter "prod".`);
     return;
 }
 
-let dbUrl = process.argv[2] || 'https://admin:admin@jmfc.dynseo.com:6984';
+let dbUrl = process.argv[2] || 'https://admin:admin@cdb.jemefaiscomprendre.com';
 let isProd = process.argv[3] === 'prod';
 let CHUNK_SIZE = 250;
 if (isProd) {

@@ -49,7 +49,7 @@ const mailerRequireTLS = parseBoolean(process.env.MAILER_REQUIRE_TLS, mailerPort
 const mailerConnectionTimeout = parseInteger(process.env.MAILER_CONNECTION_TIMEOUT);
 const mailerGreetingTimeout = parseInteger(process.env.MAILER_GREETING_TIMEOUT);
 const mailerSocketTimeout = parseInteger(process.env.MAILER_SOCKET_TIMEOUT);
-const appPublicUrl = process.env.APP_PUBLIC_URL || 'https://jmfc.dynseo.com';
+const appPublicUrl = process.env.APP_PUBLIC_URL || 'https://app.jemefaiscomprendre.com';
 
 const mailerOptions = {
     host: process.env.MAILER_HOST,
@@ -82,7 +82,7 @@ if (mailerSocketTimeout !== undefined) {
 }
 
 const corsOptions = {
-    origin: ['https://jmfc.dynseo.com'],
+    origin: ['https://app.jemefaiscomprendre.com'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,

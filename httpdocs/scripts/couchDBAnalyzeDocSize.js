@@ -1,8 +1,8 @@
 // script for analyzing sizes of documents from various databases
 
 let authString = 'admin:admin';
-let dbServerUrl = 'https://jmfc.dynseo.com:6984';
-let dbAuthUrl = `https://${authString}@jmfc.dynseo.com:6984`;
+let dbServerUrl = 'https://cdb.jemefaiscomprendre.com/';
+let dbAuthUrl = `https://${authString}@cdb.jemefaiscomprendre.com/`;
 const server = require('nano')({
     url: dbAuthUrl.trim(),
     requestDefaults: { timeout: 250000 } // 250 seconds
