@@ -482,7 +482,7 @@ async function checkSubscriptionAndBlockIfNeeded() {
 async function loadDefaultGridForNewUser() {
     try {
         // Charger la grille par défaut directement depuis l'URL
-        const defaultGridUrl = 'build/grd_base/default.grd.json';
+        const defaultGridUrl = 'app/build/grd_base/default.grd.json';
         log.info('Loading default grid from URL:', defaultGridUrl);
         
         // Charger directement le fichier JSON
